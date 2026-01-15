@@ -3,6 +3,7 @@ import { useState } from "react"
 import { CardDeck } from "./components/CardDeck"
 import { SandText } from "./components/SandText"
 import { AnalysisModal } from "./components/AnalysisModal"
+import { AnalysisResult } from "./components/AnalysisResult"
 
 const Container = styled.div`
   display: flex;
@@ -26,6 +27,7 @@ const Title = styled.h1`
 
 function App() {
   const [selectedCards, setSelectedCards] = useState<number[]>([])
+  const [viewMode, setViewMode] = useState<'SELECTION' | 'ANALYSIS'>('SELECTION');
 
   const handleCardClick = (index: number) => {
     setSelectedCards(prev => {
@@ -44,21 +46,27 @@ function App() {
   };
 
   const handleConfirm = () => {
-    console.log("Analysis started with cards:", selectedCards);
-    // TODO: Navigate to analysis page or trigger logic
+    setViewMode('ANALYSIS');
   };
 
   return (
     <Container>
       <Title>재회타로</Title>
-      {selectedCards.length === 0 && <SandText text="운명의 카드를 세장 선택해주세요." />}
-      <CardDeck selectedCards={selectedCards} onCardClick={handleCardClick} />
 
-      <AnalysisModal
-        isVisible={selectedCards.length === 3}
-        onConfirm={handleConfirm}
-        onCancel={handleReset}
-      />
+      {viewMode === 'SELECTION' ? (
+        <>
+          {selectedCards.length === 0 && <SandText text="운명의 카드를 세장 선택해주세요." />}
+          <CardDeck selectedCards={selectedCards} onCardClick={handleCardClick} />
+
+          <AnalysisModal
+            isVisible={selectedCards.length === 3}
+            onConfirm={handleConfirm}
+            onCancel={handleReset}
+          />
+        </>
+      ) : (
+        <AnalysisResult selectedCards={selectedCards} />
+      )}
     </Container>
   )
 }
