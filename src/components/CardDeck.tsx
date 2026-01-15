@@ -4,21 +4,22 @@ import { TarotCard } from './TarotCard';
 
 // === Deck Configuration ===
 const DECK_CONFIG = {
-  // Distance from bottom of the screen
   BOTTOM_OFFSET: '0',
-
-  // Base font-size for scaling card (1em = font-size)
-  // Original Card Size: 20em x 35em
   SCALE: {
     MOBILE: '0.35rem',
     TABLET: '0.5rem',
     DESKTOP: '0.5rem',
   },
+  ARC_ANGLE: 100,
+  RADIUS_PERCENT: '250%',
+  ARC_OFFSET_Y: '-8em',
+};
 
-  // Fan Geometry
-  ARC_ANGLE: 100, // Degrees
-  RADIUS_PERCENT: '250%', // Distance to rotation point (Larger = flatter arc)
-  ARC_OFFSET_Y: '-8em', // Fine-tune vertical position on the arc
+// === Selection Configuration ===
+const SELECTION_CONFIG = {
+  SCALE: 0.7,
+  GAP_PERCENT: 100, // 100 = adjacent
+  Y_OFFSET: '-50vh', // From bottom
 };
 
 const DeckContainer = styled.div`
@@ -31,37 +32,20 @@ const DeckContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-end;
+  pointer-events: none; /* Let clicks pass through container */
   
-  /* Scale controls */
   font-size: ${DECK_CONFIG.SCALE.MOBILE}; 
-
-  @media (min-width: 768px) {
-    font-size: ${DECK_CONFIG.SCALE.TABLET};
-  }
-
-  @media (min-width: 1024px) {
-    font-size: ${DECK_CONFIG.SCALE.DESKTOP};
-  }
+  @media (min-width: 768px) { font-size: ${DECK_CONFIG.SCALE.TABLET}; }
+  @media (min-width: 1024px) { font-size: ${DECK_CONFIG.SCALE.DESKTOP}; }
 `;
 
-// Removed SELECTION_CONFIG as it's now handled by SelectedCards component
-
-const CardWrapper = styled(motion.div) <{ $rotation: number }>`
+const CardWrapper = styled(motion.div)`
   position: absolute;
   bottom: 0;
   transform-origin: 50% ${DECK_CONFIG.RADIUS_PERCENT};
-  
-  /* Ensure click events work on the visible part */
   pointer-events: auto; 
   cursor: pointer;
-  
-  &:hover {
-    /* Maintain original z-index to keep overlap order */
-    transform: rotate(${props => props.$rotation}deg) translateY(calc(${DECK_CONFIG.ARC_OFFSET_Y} - 2em));
-    transition: transform 0.2s ease-out;
-  }
-  /* Base transition for hover */
-  transition: transform 0.3s ease-out;
+  z-index: 0;
 `;
 
 interface CardDeckProps {
@@ -78,20 +62,52 @@ export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
   return (
     <DeckContainer>
       {Array.from({ length: TOTAL_CARDS }).map((_, index) => {
-        // If card is selected, don't render it here (it will be in SelectedCards)
-        if (selectedCards.includes(index)) return null;
+        const isSelected = selectedCards.includes(index);
+        const selectionIndex = selectedCards.indexOf(index);
 
+        // --- 1. Fan Position Calculation ---
         const rotation = START_ANGLE + (index * ANGLE_STEP);
+        const fanX = '0%';
+        const fanY = DECK_CONFIG.ARC_OFFSET_Y;
+        const fanRotate = `${rotation}deg`;
+        const fanScale = 1;
+        const fanOrigin = `50% ${DECK_CONFIG.RADIUS_PERCENT}`;
+        const fanZIndex = index;
+
+        // --- 2. Selection Position Calculation ---
+        let selectX = '0%';
+        if (selectionIndex === 0) selectX = `-${SELECTION_CONFIG.GAP_PERCENT}%`;
+        else if (selectionIndex === 1) selectX = '0%';
+        else if (selectionIndex === 2) selectX = `${SELECTION_CONFIG.GAP_PERCENT}%`;
+
+        // We use -50vh to move up from bottom
+        const selectY = SELECTION_CONFIG.Y_OFFSET;
+        const selectRotate = '0deg';
+        const selectScale = SELECTION_CONFIG.SCALE;
+        // When selected, we want center origin for scaling/rotation
+        const selectOrigin = '50% 50%';
+        const selectZIndex = 1000 + index; // High z-index
 
         return (
           <CardWrapper
             key={index}
-            layoutId={`card-${index}`}
-            $rotation={rotation}
-            style={{
-              zIndex: index,
-              // Apply rotation via style for initial position
-              transform: `rotate(${rotation}deg) translateY(${DECK_CONFIG.ARC_OFFSET_Y})`
+            initial={false}
+            animate={{
+              x: isSelected ? selectX : fanX,
+              y: isSelected ? selectY : fanY,
+              rotate: isSelected ? selectRotate : fanRotate,
+              scale: isSelected ? selectScale : fanScale,
+              transformOrigin: isSelected ? selectOrigin : fanOrigin,
+              zIndex: isSelected ? selectZIndex : fanZIndex,
+            }}
+            whileHover={!isSelected ? {
+              y: `calc(${DECK_CONFIG.ARC_OFFSET_Y} - 2em)`,
+              transition: { duration: 0.2 }
+            } : {}}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 30,
             }}
             onClick={() => onCardClick && onCardClick(index)}
           >

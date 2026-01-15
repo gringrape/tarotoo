@@ -1,5 +1,7 @@
 import styled from "styled-components"
-import { TarotBoard } from "./components/TarotBoard"
+import { useState } from "react"
+import { CardDeck } from "./components/CardDeck"
+import { SandText } from "./components/SandText"
 
 const Container = styled.div`
   display: flex;
@@ -22,10 +24,25 @@ const Title = styled.h1`
 `
 
 function App() {
+  const [selectedCards, setSelectedCards] = useState<number[]>([])
+
+  const handleCardClick = (index: number) => {
+    setSelectedCards(prev => {
+      if (prev.includes(index)) {
+        return prev.filter(i => i !== index)
+      }
+      if (prev.length < 3) {
+        return [...prev, index]
+      }
+      return prev
+    })
+  }
+
   return (
     <Container>
       <Title>재회타로</Title>
-      <TarotBoard />
+      {selectedCards.length === 0 && <SandText text="운명의 카드를 세장 선택해주세요." />}
+      <CardDeck selectedCards={selectedCards} onCardClick={handleCardClick} />
     </Container>
   )
 }
