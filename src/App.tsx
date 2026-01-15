@@ -2,6 +2,7 @@ import styled from "styled-components"
 import { useState } from "react"
 import { CardDeck } from "./components/CardDeck"
 import { SandText } from "./components/SandText"
+import { AnalysisModal } from "./components/AnalysisModal"
 
 const Container = styled.div`
   display: flex;
@@ -38,11 +39,26 @@ function App() {
     })
   }
 
+  const handleReset = () => {
+    setSelectedCards([]);
+  };
+
+  const handleConfirm = () => {
+    console.log("Analysis started with cards:", selectedCards);
+    // TODO: Navigate to analysis page or trigger logic
+  };
+
   return (
     <Container>
       <Title>재회타로</Title>
       {selectedCards.length === 0 && <SandText text="운명의 카드를 세장 선택해주세요." />}
       <CardDeck selectedCards={selectedCards} onCardClick={handleCardClick} />
+
+      <AnalysisModal
+        isVisible={selectedCards.length === 3}
+        onConfirm={handleConfirm}
+        onCancel={handleReset}
+      />
     </Container>
   )
 }
