@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { CardDeck } from "./components/CardDeck"
+import { TarotBoard } from "./components/TarotBoard"
 
 const Container = styled.div`
   display: flex;
@@ -21,21 +21,11 @@ const Title = styled.h1`
   margin-bottom: 2rem;
 `
 
-const FooterMessage = styled.div`
-  position: absolute;
-  bottom: 250px; /* Above the cards */
-  color: white;
-  font-size: 1.2rem;
-  opacity: 0.8;
-  z-index: 0;
-`
-
 function App() {
   return (
     <Container>
       <Title>재회타로</Title>
-      <FooterMessage>운명의 카드를 선택해 주세요</FooterMessage>
-      <CardDeck />
+      <TarotBoard />
     </Container>
   )
 }
