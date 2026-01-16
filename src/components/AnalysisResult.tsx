@@ -2,18 +2,12 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { TarotCard } from './TarotCard';
+import { TAROT_DATA } from '../data/tarotData';
 
-// === Dummy Data ===
-const ANALYSIS_DATA = {
-    cards: [
-        { type: '과거', desc: '당신의 과거는 혼란스러웠습니다. 하지만 그 속에서도 희망을 잃지 않았군요. 이 카드는 당신이 겪어온 시련이 헛되지 않았음을 의미합니다.' },
-        { type: '현재', desc: '현재 상황은 정체되어 보일 수 있습니다. 하지만 물밑에서는 새로운 변화가 태동하고 있습니다. 인내심을 갖고 지켜볼 시기입니다.' },
-        { type: '미래', desc: '미래에는 기대 이상의 성과가 기다리고 있습니다. 당신의 노력이 결실을 맺고, 원하던 관계의 회복이 이루어질 가능성이 높습니다.' }
-    ],
-    result: {
-        probability: '85%',
-        strategy: '서두르지 말고 상대방의 입장을 먼저 생각하며 천천히 다가가세요. 진심 어린 대화가 열쇠입니다.'
-    }
+// === Dummy Data for Final Result ===
+const FINAL_RESULT = {
+    probability: '85%',
+    strategy: '서두르지 말고 상대방의 입장을 먼저 생각하며 천천히 다가가세요. 진심 어린 대화가 열쇠입니다.'
 };
 
 const Container = styled.div`
@@ -46,7 +40,7 @@ const CardWrapper = styled(motion.div)`
 const TextContainer = styled(motion.div)`
   width: 90%;
   max-width: 600px;
-  min-height: 200px; /* Slightly taller for final result */
+  min-height: 200px;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
   padding: 2rem;
@@ -64,6 +58,12 @@ const TypeLabel = styled.h3`
   font-family: 'KerisKeduLine', sans-serif;
   font-size: 1.5rem;
   color: #E0D4FC;
+  margin-bottom: 0.5rem;
+`;
+
+const CardName = styled.h4`
+  font-size: 1.2rem;
+  color: #FFD700;
   margin-bottom: 1rem;
 `;
 
@@ -122,7 +122,8 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
 
         if (step === 2 || step === 4 || step === 6) {
             const cardIndex = (step / 2) - 1;
-            const targetText = ANALYSIS_DATA.cards[cardIndex].desc;
+            const selectedCardId = selectedCards[cardIndex];
+            const targetText = TAROT_DATA[selectedCardId].desc;
             let charIndex = 0;
 
             const interval = setInterval(() => {
@@ -140,7 +141,7 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
 
             return () => clearInterval(interval);
         }
-    }, [step]);
+    }, [step, selectedCards]);
 
     // Determine flip status based on step
     const getIsFlipped = (index: number) => {
@@ -152,9 +153,19 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
 
     // Determine current showing text
     const getCurrentTextInfo = () => {
-        if (step <= 2) return ANALYSIS_DATA.cards[0];
-        if (step <= 4) return ANALYSIS_DATA.cards[1];
-        return ANALYSIS_DATA.cards[2];
+        const cardIndex = Math.min(Math.floor((step - 1) / 2), 2);
+        // Safety check
+        if (cardIndex < 0) return { type: '대기 중', name: '', desc: '' };
+
+        const types = ['과거', '현재', '미래'];
+        const cardId = selectedCards[cardIndex];
+        const cardData = TAROT_DATA[cardId];
+
+        return {
+            type: types[cardIndex],
+            name: cardData.name,
+            desc: cardData.desc
+        };
     };
 
     const textInfo = getCurrentTextInfo();
@@ -163,14 +174,17 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
     return (
         <Container>
             <CardsRow>
-                {selectedCards.map((_, i) => (
+                {selectedCards.map((cardIndex, i) => (
                     <CardWrapper
                         key={i}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: i * 0.2 }}
                     >
-                        <TarotCard isFlipped={getIsFlipped(i)} />
+                        <TarotCard
+                            isFlipped={getIsFlipped(i)}
+                            image={TAROT_DATA[cardIndex].image}
+                        />
                     </CardWrapper>
                 ))}
             </CardsRow>
@@ -188,6 +202,7 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
                         style={{ width: '100%' }}
                     >
                         <TypeLabel>{textInfo.type}</TypeLabel>
+                        <CardName>{textInfo.name}</CardName>
                         <TypeText>{typedText}</TypeText>
                     </motion.div>
                 )}
@@ -200,8 +215,8 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
                         transition={{ type: 'spring' }}
                     >
                         <ResultTitle>최종 분석 결과</ResultTitle>
-                        <ResultValue>재회확률 {ANALYSIS_DATA.result.probability}</ResultValue>
-                        <ResultDesc>{ANALYSIS_DATA.result.strategy}</ResultDesc>
+                        <ResultValue>재회확률 {FINAL_RESULT.probability}</ResultValue>
+                        <ResultDesc>{FINAL_RESULT.strategy}</ResultDesc>
                     </motion.div>
                 )}
             </TextContainer>

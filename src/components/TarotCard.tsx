@@ -1,7 +1,6 @@
 
 import styled from 'styled-components';
 import { TarotBackDesign } from './TarotBackDesign';
-import tarotImg from '../assets/tarot-1.png';
 
 // Scene: 3D 공간의 원근감을 정의합니다.
 const Scene = styled.div`
@@ -75,9 +74,10 @@ const CardBorder = styled.div`
 
 interface TarotCardProps {
   isFlipped?: boolean;
+  image?: string;
 }
 
-export function TarotCard({ isFlipped = false }: TarotCardProps) {
+export function TarotCard({ isFlipped = false, image }: TarotCardProps) {
   return (
     <Scene>
       <Card isFlipped={isFlipped}>
@@ -86,7 +86,7 @@ export function TarotCard({ isFlipped = false }: TarotCardProps) {
           <TarotBackDesign />
         </CardFaceBack>
         <CardFaceFront>
-          <img src={tarotImg} alt="Tarot Card Front" />
+          <img src={image} alt="Tarot Card Front" />
         </CardFaceFront>
       </Card>
     </Scene>

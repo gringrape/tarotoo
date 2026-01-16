@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { TarotCard } from './TarotCard';
+import { TAROT_DATA } from '../data/tarotData';
 
 // === Deck Configuration ===
 const DECK_CONFIG = {
@@ -111,7 +112,7 @@ export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
             }}
             onClick={() => onCardClick && onCardClick(index)}
           >
-            <TarotCard />
+            <TarotCard image={TAROT_DATA[index]?.image} />
           </CardWrapper>
         );
       })}
