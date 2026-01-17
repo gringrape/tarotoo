@@ -17,7 +17,7 @@ export interface AnalysisResponse {
 const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3000';
 
 export async function fetchAnalysis(theirCards: string[], myCards: string[]): Promise<AnalysisResponse> {
-    const response = await fetch(`${API_ENDPOINT}/analyze`, {
+    const response = await fetch(`${API_ENDPOINT}/api/analyze`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
