@@ -57,34 +57,34 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
 `;
 
 interface AnalysisModalProps {
-    isVisible: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
+  isVisible: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
 export function AnalysisModal({ isVisible, onConfirm, onCancel }: AnalysisModalProps) {
-    return (
-        <AnimatePresence>
-            {isVisible && (
-                <Backdrop
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                >
-                    <ModalContent
-                        initial={{ scale: 0.8, opacity: 0, y: 20 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.8, opacity: 0, y: 20 }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                    >
-                        <Question>분석을 시작할까요?</Question>
-                        <ButtonGroup>
-                            <Button $variant="secondary" onClick={onCancel}>다시 고르기</Button>
-                            <Button onClick={onConfirm}>네</Button>
-                        </ButtonGroup>
-                    </ModalContent>
-                </Backdrop>
-            )}
-        </AnimatePresence>
-    );
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <Backdrop
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <ModalContent
+            initial={{ scale: 0.8, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.8, opacity: 0, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          >
+            <Question>분석을 시작할까요?</Question>
+            <ButtonGroup>
+              <Button $variant="secondary" onClick={onCancel} data-testid="cancel-button">다시 고르기</Button>
+              <Button onClick={onConfirm} data-testid="confirm-button">네</Button>
+            </ButtonGroup>
+          </ModalContent>
+        </Backdrop>
+      )}
+    </AnimatePresence>
+  );
 }
