@@ -3,12 +3,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { TarotCard } from './TarotCard';
 import { TAROT_DATA } from '../data/tarotData';
-
-// === Dummy Data for Final Result ===
-const FINAL_RESULT = {
-    probability: '85%',
-    strategy: '서두르지 말고 상대방의 입장을 먼저 생각하며 천천히 다가가세요. 진심 어린 대화가 열쇠입니다.'
-};
+import { fetchAnalysis, type AnalysisResponse } from '../api/tarotApi';
 
 const Container = styled.div`
   display: flex;
@@ -95,6 +90,19 @@ const ResultDesc = styled.p`
   color: #ddd;
 `;
 
+const LoadingText = styled.div`
+  font-family: 'KerisKeduLine', sans-serif;
+  font-size: 1.5rem;
+  color: #E0D4FC;
+  animation: blink 1.5s infinite;
+  
+  @keyframes blink {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+  }
+`;
+
 interface AnalysisResultProps {
     selectedCards: number[];
 }
@@ -103,14 +111,35 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
     // 0: Start, 1: Flip 1, 2: Text 1, 3: Flip 2, 4: Text 2, 5: Flip 3, 6: Text 3, 7: Final
     const [step, setStep] = useState(0);
     const [typedText, setTypedText] = useState('');
+    const [analysisData, setAnalysisData] = useState<AnalysisResponse | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Initial delay
-        const t0 = setTimeout(() => setStep(1), 1000);
-        return () => clearTimeout(t0);
-    }, []);
+        const loadAnalysis = async () => {
+            try {
+                setLoading(true);
+                // Convert indices to card names
+                const selectedCardNames = selectedCards.map(idx => TAROT_DATA[idx].name);
+                const data = await fetchAnalysis(selectedCardNames);
+                setAnalysisData(data);
+
+                // Start animation sequence after data is loaded
+                setTimeout(() => setStep(1), 500);
+            } catch (err) {
+                console.error(err);
+                setError('분석 결과를 불러오는데 실패했습니다.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadAnalysis();
+    }, [selectedCards]);
 
     useEffect(() => {
+        if (!analysisData) return;
+
         if (step === 1 || step === 3 || step === 5) {
             // Card Flip -> Wait then start typing
             const t = setTimeout(() => {
@@ -122,8 +151,8 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
 
         if (step === 2 || step === 4 || step === 6) {
             const cardIndex = (step / 2) - 1;
-            const selectedCardId = selectedCards[cardIndex];
-            const targetText = TAROT_DATA[selectedCardId].desc;
+            // Use API data for description
+            const targetText = analysisData.cards[cardIndex].desc;
             let charIndex = 0;
 
             const interval = setInterval(() => {
@@ -141,7 +170,7 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
 
             return () => clearInterval(interval);
         }
-    }, [step, selectedCards]);
+    }, [step, analysisData]);
 
     // Determine flip status based on step
     const getIsFlipped = (index: number) => {
@@ -153,23 +182,56 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
 
     // Determine current showing text
     const getCurrentTextInfo = () => {
+        if (!analysisData) return { type: '', name: '', desc: '' };
+
         const cardIndex = Math.min(Math.floor((step - 1) / 2), 2);
-        // Safety check
-        if (cardIndex < 0) return { type: '대기 중', name: '', desc: '' };
+        if (cardIndex < 0) return { type: '운명을 읽는 중...', name: '', desc: '' };
 
         const types = ['과거', '현재', '미래'];
-        const cardId = selectedCards[cardIndex];
-        const cardData = TAROT_DATA[cardId];
 
+        // Use name from API response as requested
         return {
             type: types[cardIndex],
-            name: cardData.name,
-            desc: cardData.desc
+            name: analysisData.cards[cardIndex].name,
+            desc: analysisData.cards[cardIndex].desc
         };
     };
 
     const textInfo = getCurrentTextInfo();
     const isFinal = step >= 7;
+
+    if (loading) {
+        return (
+            <Container>
+                <CardsRow>
+                    {selectedCards.map((cardIndex, i) => (
+                        <CardWrapper
+                            key={i}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: i * 0.2 }}
+                        >
+                            {/* Initially face down while loading */}
+                            <TarotCard isFlipped={false} image={TAROT_DATA[cardIndex].image} />
+                        </CardWrapper>
+                    ))}
+                </CardsRow>
+                <TextContainer>
+                    <LoadingText>운명을 분석하고 있습니다...</LoadingText>
+                </TextContainer>
+            </Container>
+        );
+    }
+
+    if (error) {
+        return (
+            <Container>
+                <TextContainer>
+                    <TypeText>{error}</TypeText>
+                </TextContainer>
+            </Container>
+        );
+    }
 
     return (
         <Container>
@@ -208,15 +270,15 @@ export function AnalysisResult({ selectedCards }: AnalysisResultProps) {
                 )}
 
                 {/* Final Result: Show in same container */}
-                {isFinal && (
+                {isFinal && analysisData && (
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ type: 'spring' }}
                     >
                         <ResultTitle>최종 분석 결과</ResultTitle>
-                        <ResultValue>재회확률 {FINAL_RESULT.probability}</ResultValue>
-                        <ResultDesc>{FINAL_RESULT.strategy}</ResultDesc>
+                        {/* Probability removed as requested */}
+                        <ResultDesc>{analysisData.result.strategy}</ResultDesc>
                     </motion.div>
                 )}
             </TextContainer>
