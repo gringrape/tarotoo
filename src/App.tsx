@@ -26,46 +26,66 @@ const Title = styled.h1`
 `
 
 function App() {
-  const [selectedCards, setSelectedCards] = useState<number[]>([])
-  const [viewMode, setViewMode] = useState<'SELECTION' | 'ANALYSIS'>('SELECTION');
+  const [theirCards, setTheirCards] = useState<number[]>([]);
+  const [myCards, setMyCards] = useState<number[]>([]);
+  const [phase, setPhase] = useState<'THEIR' | 'MY' | 'ANALYSIS'>('THEIR');
 
   const handleCardClick = (index: number) => {
-    setSelectedCards(prev => {
-      if (prev.includes(index)) {
-        return prev.filter(i => i !== index)
-      }
-      if (prev.length < 3) {
-        return [...prev, index]
-      }
-      return prev
-    })
-  }
+    if (phase === 'ANALYSIS') return;
+
+    const isTheirTurn = phase === 'THEIR';
+    const currentCards = isTheirTurn ? theirCards : myCards;
+    const setCards = isTheirTurn ? setTheirCards : setMyCards;
+
+    if (currentCards.includes(index)) {
+      setCards(prev => prev.filter(i => i !== index));
+    } else if (currentCards.length < 3) {
+      setCards(prev => [...prev, index]);
+    }
+  };
 
   const handleReset = () => {
-    setSelectedCards([]);
+    if (phase === 'THEIR') {
+      setTheirCards([]);
+    } else if (phase === 'MY') {
+      setMyCards([]);
+    }
   };
 
   const handleConfirm = () => {
-    setViewMode('ANALYSIS');
+    if (phase === 'THEIR') {
+      setPhase('MY');
+    } else {
+      setPhase('ANALYSIS');
+    }
+  };
+
+  const currentSelection = phase === 'THEIR' ? theirCards : myCards;
+  const isSelectionComplete = currentSelection.length === 3;
+
+  // Dynamic Title/Prompt based on phase
+  const getPromptText = () => {
+    if (phase === 'THEIR') return "나를 향한 상대방의 마음을 떠올리며<br/>카드 세 장을 선택해주세요.";
+    return "상대방을 향한 나의 마음을 떠올리며<br/>카드 세 장을 선택해주세요.";
   };
 
   return (
     <Container>
       <Title>재회타로</Title>
 
-      {viewMode === 'SELECTION' ? (
+      {phase !== 'ANALYSIS' ? (
         <>
-          {selectedCards.length === 0 && <SandText text="운명의 카드를 세장 선택해주세요." />}
-          <CardDeck selectedCards={selectedCards} onCardClick={handleCardClick} />
+          {currentSelection.length < 3 && <SandText text={getPromptText()} />}
+          <CardDeck selectedCards={currentSelection} onCardClick={handleCardClick} />
 
           <AnalysisModal
-            isVisible={selectedCards.length === 3}
+            isVisible={isSelectionComplete}
             onConfirm={handleConfirm}
             onCancel={handleReset}
           />
         </>
       ) : (
-        <AnalysisResult selectedCards={selectedCards} />
+        <AnalysisResult theirCards={theirCards} myCards={myCards} />
       )}
     </Container>
   )

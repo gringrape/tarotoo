@@ -111,6 +111,7 @@ export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
               damping: 30,
             }}
             onClick={() => onCardClick && onCardClick(index)}
+            data-testid={`card-wrapper-${index}`}
           >
             <TarotCard image={TAROT_DATA[index]?.image} />
           </CardWrapper>
