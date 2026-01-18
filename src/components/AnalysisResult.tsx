@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAnalysisFlow } from '../hooks/useAnalysisFlow';
 import { InfoBoard } from './InfoBoard';
@@ -27,6 +28,14 @@ const LoadingText = styled.div`
     100% { opacity: 0.3; }
   }
 `;
+
+const LOADING_MESSAGES = [
+  "운명을 분석하고 있습니다...",
+  "별들의 속삭임을 듣고 있어요...",
+  "카드의 신호를 해석하는 중입니다...",
+  "당신의 이야기를 읽고 있습니다...",
+  "잠시만 기다려주세요..."
+];
 
 interface AnalysisResultProps {
   theirCards: number[];
@@ -75,11 +84,26 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
     nextPhase
   } = useAnalysisFlow({ theirCards, myCards });
 
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!loading) return;
+
+    // Rotate messages every 3 seconds
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [loading]);
+
   if (loading) {
     return (
       <Container style={{ justifyContent: 'center' }}>
         <LoadingScene />
-        <LoadingText style={{ marginTop: '2rem' }}>운명을 분석하고 있습니다...</LoadingText>
+        <LoadingText style={{ marginTop: '2rem' }}>
+          {LOADING_MESSAGES[messageIndex]}
+        </LoadingText>
       </Container>
     );
   }
