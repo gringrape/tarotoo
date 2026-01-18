@@ -34,7 +34,8 @@ const DeckContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  pointer-events: none; /* Let clicks pass through container */
+  pointer-events: none;
+  z-index: 10;
   
   font-size: ${DECK_CONFIG.SCALE.MOBILE}; 
   @media (min-width: 768px) { font-size: ${DECK_CONFIG.SCALE.TABLET}; }
@@ -77,14 +78,10 @@ export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
   return (
     <DeckContainer>
       {shuffledIndices.map((cardId, index) => {
-        // cardId is the actual data index (e.g. 0 for Fool)
-        // index is the position in the fan (visual index)
-
         const isSelected = selectedCards.includes(cardId);
         const selectionIndex = selectedCards.indexOf(cardId);
 
         // --- 1. Fan Position Calculation ---
-        // Visual position depends on loop index
         const rotation = START_ANGLE + (index * ANGLE_STEP);
         const fanX = '0%';
         const fanY = DECK_CONFIG.ARC_OFFSET_Y;
@@ -99,13 +96,11 @@ export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
         else if (selectionIndex === 1) selectX = '0%';
         else if (selectionIndex === 2) selectX = `${SELECTION_CONFIG.GAP_PERCENT}%`;
 
-        // We use -50vh to move up from bottom
         const selectY = SELECTION_CONFIG.Y_OFFSET;
         const selectRotate = '0deg';
         const selectScale = SELECTION_CONFIG.SCALE;
-        // When selected, we want center origin for scaling/rotation
         const selectOrigin = '50% 50%';
-        const selectZIndex = 1000 + index; // High z-index
+        const selectZIndex = 1000 + index;
 
         return (
           <CardWrapper

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useAnalysisFlow } from '../hooks/useAnalysisFlow';
 import { InfoBoard } from './InfoBoard';
+import { LoadingScene } from './Three/LoadingScene';
 
 const Container = styled.div`
   display: flex;
@@ -76,18 +77,12 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
 
   if (loading) {
     return (
-      <Container>
-        <LoadingText>운명을 분석하고 있습니다...</LoadingText>
+      <Container style={{ justifyContent: 'center' }}>
+        <LoadingScene />
+        <LoadingText style={{ marginTop: '2rem' }}>운명을 분석하고 있습니다...</LoadingText>
       </Container>
     );
   }
-
-  // Allow proceeding if not in loading or error state, logic depends on step.
-  // In new flow, we might want "Next" to always be available or auto-flow?
-  // Hook handles auto-advance. Button is manual override.
-  // Show button at end of text steps?
-  // step 6 and 12 wait for user. step > 12 is final.
-
 
   return (
     <Container>

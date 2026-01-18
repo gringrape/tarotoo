@@ -42,7 +42,7 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(mockResponse));
             console.log('Response sent.');
-        }, 10000); // 10 seconds delay
+        }, 100000); // 10 seconds delay
     } else {
         res.writeHead(404);
         res.end('Not Found');
