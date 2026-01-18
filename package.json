@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node mock-server.cjs & vite",
+    "start": "VITE_API_ENDPOINT=http://localhost:3000 vite",
+    "dev": "VITE_API_ENDPOINT=http://localhost:3001 node mock-server.cjs & vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",

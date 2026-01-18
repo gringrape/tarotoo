@@ -83,6 +83,7 @@ const CardDisplay = styled(motion.div)`
   width: 20em; /* Matches TarotCard width in ems */
   height: 35em; /* Matches TarotCard aspect ratio */
   perspective: 1000px;
+  transform-style: preserve-3d;
   position: relative;
   flex-shrink: 0;
 `;
@@ -160,16 +161,11 @@ export function InfoBoard({ isVisible, isFinal, isFlipStep, textInfo, analysisDa
     >
       <AnimatePresence mode="wait">
         {!isFinal && isVisible && textInfo.cardId !== null && (
-          <ContentWrapper key="analysis-step">
+          <ContentWrapper key={textInfo.cardId}>
             {/* Header: Section Title */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              style={{ width: '100%', marginBottom: '1rem' }}
-            >
+            <div style={{ width: '100%', marginBottom: '1rem' }}>
               <TypeLabel>{textInfo.section}</TypeLabel>
-            </motion.div>
+            </div>
 
             <CardName>{textInfo.name}</CardName>
             <RowWrapper>
