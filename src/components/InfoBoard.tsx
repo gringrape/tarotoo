@@ -59,8 +59,8 @@ const TypeText = styled.p`
   font-size: 1.1rem;
   line-height: 1.8;
   white-space: pre-wrap;
-  word-break: break-word;
-  word-wrap: break-word;
+  word-break: keep-all;
+  word-wrap: break-word; /* Fallback for very long words */
 `;
 
 const ResultTitle = styled.h2`
@@ -75,73 +75,74 @@ const ResultDesc = styled.p`
   font-size: 1rem;
   line-height: 1.8;
   color: #ddd;
-  word-break: break-word;
+  word-break: keep-all;
+  word-wrap: break-word; /* Fallback */
   white-space: pre-wrap;
 `;
 
 interface InfoBoardProps {
-    isVisible: boolean;
-    isFinal: boolean;
-    textInfo: {
-        section: string;
-        name: string;
-        typedText: string; // The currently typed text passed from parent/hook
-    };
-    analysisData: AnalysisResponse | null;
-    error: string | null;
+  isVisible: boolean;
+  isFinal: boolean;
+  textInfo: {
+    section: string;
+    name: string;
+    typedText: string; // The currently typed text passed from parent/hook
+  };
+  analysisData: AnalysisResponse | null;
+  error: string | null;
 }
 
 export function InfoBoard({ isVisible, isFinal, textInfo, analysisData, error }: InfoBoardProps) {
-    if (error) {
-        return (
-            <TextContainer>
-                <TypeText>{error}</TypeText>
-            </TextContainer>
-        );
-    }
-
+  if (error) {
     return (
-        <TextContainer
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isVisible ? 1 : 0 }}
-        >
-            {!isFinal && isVisible && (
-                <motion.div
-                    key={textInfo.section + textInfo.name}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{ width: '100%' }}
-                >
-                    <TypeLabel>{textInfo.section}</TypeLabel>
-                    <CardName>{textInfo.name}</CardName>
-                    <TypeText>{textInfo.typedText}</TypeText>
-                </motion.div>
-            )}
-
-            {isFinal && analysisData && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ type: 'spring' }}
-                >
-                    <ResultTitle>종합 분석 결과</ResultTitle>
-
-                    <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
-                        <CardName>나를 향한 상대방의 마음 (총평)</CardName>
-                        <ResultDesc>{analysisData.theirFeelings.summary}</ResultDesc>
-                    </div>
-
-                    <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
-                        <CardName>상대방을 향한 나의 마음 (총평)</CardName>
-                        <ResultDesc>{analysisData.myFeelings.summary}</ResultDesc>
-                    </div>
-
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '1rem' }}>
-                        <CardName>종합 전략</CardName>
-                        <ResultDesc>{analysisData.overallStrategy}</ResultDesc>
-                    </div>
-                </motion.div>
-            )}
-        </TextContainer>
+      <TextContainer>
+        <TypeText>{error}</TypeText>
+      </TextContainer>
     );
+  }
+
+  return (
+    <TextContainer
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isVisible ? 1 : 0 }}
+    >
+      {!isFinal && isVisible && (
+        <motion.div
+          key={textInfo.section + textInfo.name}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{ width: '100%' }}
+        >
+          <TypeLabel>{textInfo.section}</TypeLabel>
+          <CardName>{textInfo.name}</CardName>
+          <TypeText>{textInfo.typedText}</TypeText>
+        </motion.div>
+      )}
+
+      {isFinal && analysisData && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring' }}
+        >
+          <ResultTitle>종합 분석 결과</ResultTitle>
+
+          <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
+            <CardName>나를 향한 상대방의 마음 (총평)</CardName>
+            <ResultDesc>{analysisData.theirFeelings.summary}</ResultDesc>
+          </div>
+
+          <div style={{ marginBottom: '2rem', textAlign: 'left' }}>
+            <CardName>상대방을 향한 나의 마음 (총평)</CardName>
+            <ResultDesc>{analysisData.myFeelings.summary}</ResultDesc>
+          </div>
+
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '1rem' }}>
+            <CardName>종합 전략</CardName>
+            <ResultDesc>{analysisData.overallStrategy}</ResultDesc>
+          </div>
+        </motion.div>
+      )}
+    </TextContainer>
+  );
 }
