@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { TarotCard } from './TarotCard';
@@ -60,13 +61,30 @@ export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
   const START_ANGLE = -ARC_ANGLE / 2;
   const ANGLE_STEP = ARC_ANGLE / (TOTAL_CARDS - 1);
 
+  // Randomize card order on mount
+  const shuffledIndices = useMemo(() => {
+    const indices = Array.from({ length: TOTAL_CARDS }, (_, i) => i);
+
+    // Fisher-Yates shuffle
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+
+    return indices;
+  }, []);
+
   return (
     <DeckContainer>
-      {Array.from({ length: TOTAL_CARDS }).map((_, index) => {
-        const isSelected = selectedCards.includes(index);
-        const selectionIndex = selectedCards.indexOf(index);
+      {shuffledIndices.map((cardId, index) => {
+        // cardId is the actual data index (e.g. 0 for Fool)
+        // index is the position in the fan (visual index)
+
+        const isSelected = selectedCards.includes(cardId);
+        const selectionIndex = selectedCards.indexOf(cardId);
 
         // --- 1. Fan Position Calculation ---
+        // Visual position depends on loop index
         const rotation = START_ANGLE + (index * ANGLE_STEP);
         const fanX = '0%';
         const fanY = DECK_CONFIG.ARC_OFFSET_Y;
@@ -91,7 +109,7 @@ export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
 
         return (
           <CardWrapper
-            key={index}
+            key={cardId}
             initial={false}
             animate={{
               x: isSelected ? selectX : fanX,
@@ -110,10 +128,10 @@ export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
               stiffness: 300,
               damping: 30,
             }}
-            onClick={() => onCardClick && onCardClick(index)}
-            data-testid={`card-wrapper-${index}`}
+            onClick={() => onCardClick && onCardClick(cardId)}
+            data-testid={`card-wrapper-${cardId}`}
           >
-            <TarotCard image={TAROT_DATA[index]?.image} />
+            <TarotCard image={TAROT_DATA[cardId]?.image} />
           </CardWrapper>
         );
       })}
