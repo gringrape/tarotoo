@@ -40,7 +40,7 @@ const TextContainer = styled(motion.div)`
 `;
 
 const TypeLabel = styled.h3`
-  font-family: 'KerisKeduLine', sans-serif;
+  font-family: 'GounBatang', serif;
   font-size: 1.5rem;
   color: #E0D4FC;
   margin-bottom: 0.5rem;
@@ -55,7 +55,7 @@ const CardName = styled.h4`
 `;
 
 const TypeText = styled.p`
-  font-family: 'Suit', sans-serif;
+  font-family: 'GounBatang', serif;
   font-size: 1.1rem;
   line-height: 1.8;
   white-space: pre-wrap;
@@ -64,7 +64,7 @@ const TypeText = styled.p`
 `;
 
 const ResultTitle = styled.h2`
-  font-family: 'KerisKeduLine', sans-serif;
+  font-family: 'GounBatang', serif;
   font-size: 2rem;
   margin-bottom: 1rem;
   color: #FFD700;

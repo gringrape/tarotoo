@@ -14,7 +14,7 @@ const Container = styled.div`
 `;
 
 const LoadingText = styled.div`
-  font-family: 'KerisKeduLine', sans-serif;
+  font-family: 'GounBatang', serif;
   font-size: 1.5rem;
   color: #E0D4FC;
   animation: blink 1.5s infinite;
@@ -45,7 +45,7 @@ const NextButton = styled.button`
   font-size: 1.2rem;
   border-radius: 50px;
   cursor: pointer;
-  font-family: 'Suit', sans-serif;
+  font-family: 'GounBatang', serif;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   transition: all 0.2s ease;
   animation: fadeIn 0.5s ease-in-out;

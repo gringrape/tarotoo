@@ -4,6 +4,7 @@ import { CardDeck } from "./components/CardDeck"
 import { SandText } from "./components/SandText"
 import { AnalysisModal } from "./components/AnalysisModal"
 import { AnalysisResult } from "./components/AnalysisResult"
+import backImg from "./assets/background.jpg"
 
 const Container = styled.div`
   display: flex;
@@ -12,7 +13,18 @@ const Container = styled.div`
   justify-content: flex-start;
   height: 100vh;
   width: 100%;
-  background-color: #3E0075;
+  background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.8) 0%,
+      transparent 30%,
+      transparent 70%,
+      rgba(0, 0, 0, 0.8) 100%
+    ),
+    linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+    url(${backImg});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: white;
   padding: 4rem 0;
   box-sizing: border-box;
@@ -20,7 +32,7 @@ const Container = styled.div`
 `
 
 const Title = styled.h1`
-  font-family: 'KerisKeduLine', sans-serif;
+  font-family: 'GounBatang', serif;
   font-size: 3rem;
   margin-bottom: 2rem;
 `

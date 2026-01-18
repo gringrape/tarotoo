@@ -23,7 +23,7 @@ const Wrapper = styled.div<{ $isVisible: boolean }>`
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.3em;
-  font-family: 'KerisKeduLine', sans-serif;
+  font-family: 'GounBatang', serif;
   font-size: 1.5rem;
   color: white;
   pointer-events: none;

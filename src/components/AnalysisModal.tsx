@@ -27,7 +27,7 @@ const ModalContent = styled(motion.div)`
 `;
 
 const Question = styled.h2`
-  font-family: 'KerisKeduLine', sans-serif;
+  font-family: 'GounBatang', serif;
   font-size: 2rem;
   margin-bottom: 3rem;
   color: #E0D4FC;
@@ -47,7 +47,7 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
   font-size: 1.1rem;
   border-radius: 50px;
   cursor: pointer;
-  font-family: 'Suit', sans-serif;
+  font-family: 'GounBatang', serif;
   transition: all 0.2s ease;
 
   &:hover {
