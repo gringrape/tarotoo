@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { useAnalysisFlow } from '../hooks/useAnalysisFlow';
-import { CardSection } from './CardSection';
 import { InfoBoard } from './InfoBoard';
 
 const Container = styled.div`
@@ -11,6 +10,8 @@ const Container = styled.div`
   padding-top: 1rem;
   color: #fff;
   padding-bottom: 4rem;
+  justify-content: flex-start;
+  min-height: 80vh; /* Center properly */
 `;
 
 const LoadingText = styled.div`
@@ -27,8 +28,8 @@ const LoadingText = styled.div`
 `;
 
 interface AnalysisResultProps {
-    theirCards: number[];
-    myCards: number[];
+  theirCards: number[];
+  myCards: number[];
 }
 
 const NextButton = styled.button`
@@ -62,62 +63,48 @@ const NextButton = styled.button`
 `;
 
 export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
-    const {
-        step,
-        loading,
-        error,
-        analysisData,
-        typedText,
-        textInfo,
-        isFinal,
-        getIsFlipped,
-        nextPhase
-    } = useAnalysisFlow({ theirCards, myCards });
+  const {
+    step,
+    loading,
+    error,
+    analysisData,
+    textInfo,
+    isFinal,
+    isFlipStep,
+    nextPhase
+  } = useAnalysisFlow({ theirCards, myCards });
 
-    if (loading) {
-        return (
-            <Container>
-                <LoadingText>운명을 분석하고 있습니다...</LoadingText>
-            </Container>
-        );
-    }
-
-    const showTheirCards = step <= 6;
-    const showMyCards = step > 6 && step <= 12;
-    const canProceed = (step === 6 || step === 12);
-
+  if (loading) {
     return (
-        <Container>
-            {showTheirCards && (
-                <CardSection
-                    title="나를 향한 상대방의 마음"
-                    cards={theirCards}
-                    isFlippedFn={(i) => getIsFlipped('THEIR', i)}
-                />
-            )}
-
-            {showMyCards && (
-                <CardSection
-                    title="상대방을 향한 나의 마음"
-                    cards={myCards}
-                    isFlippedFn={(i) => getIsFlipped('MY', i)}
-                    delayStart={0}
-                />
-            )}
-
-            <InfoBoard
-                isVisible={true}
-                isFinal={isFinal}
-                textInfo={{ ...textInfo, typedText }}
-                analysisData={analysisData}
-                error={error}
-            />
-
-            {canProceed && (
-                <NextButton onClick={nextPhase}>
-                    다음으로
-                </NextButton>
-            )}
-        </Container>
+      <Container>
+        <LoadingText>운명을 분석하고 있습니다...</LoadingText>
+      </Container>
     );
+  }
+
+  // Allow proceeding if not in loading or error state, logic depends on step.
+  // In new flow, we might want "Next" to always be available or auto-flow?
+  // Hook handles auto-advance. Button is manual override.
+  // Show button at end of text steps?
+  // step 6 and 12 wait for user. step > 12 is final.
+
+
+  return (
+    <Container>
+      <InfoBoard
+        isVisible={true}
+        isFinal={isFinal}
+        isFlipStep={isFlipStep}
+        textInfo={textInfo}
+        analysisData={analysisData}
+        error={error}
+      />
+
+      {(step % 2 === 0 && step > 0 && step <= 12) && (
+        <NextButton onClick={nextPhase}>
+          다음으로
+        </NextButton>
+      )}
+    </Container>
+  );
 }

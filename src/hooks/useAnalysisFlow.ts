@@ -9,7 +9,6 @@ interface UseAnalysisFlowProps {
 
 export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
     const [step, setStep] = useState(0);
-    const [typedText, setTypedText] = useState('');
     const [analysisData, setAnalysisData] = useState<AnalysisResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -38,12 +37,13 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
         loadAnalysis();
     }, [theirCards, myCards]);
 
-    // 2. Flow & Typing Logic
+    // 2. Flow Logic
     useEffect(() => {
         if (!analysisData) return;
 
-        // Steps that initiate typing (even numbers: 2, 4, 6... 12)
-        // Flip steps are odd numbers (1, 3... 11)
+        // Steps:
+        // 1, 3, 5, 7, 9, 11: Flip Animation (Odd)
+        // 2, 4, 6, 8, 10, 12: Text Reading (Even)
 
         const isFlipStep = step % 2 !== 0 && step < 13;
         const isTextStep = step % 2 === 0 && step > 0 && step < 13;
@@ -51,47 +51,20 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
         if (isFlipStep) {
             const t = setTimeout(() => {
                 setStep(prev => prev + 1);
-                setTypedText('');
-            }, 800);
+            }, 800); // Duration for flip animation
             return () => clearTimeout(t);
         }
 
         if (isTextStep) {
-            let targetText = "";
-            const globalCardIndex = (step / 2) - 1; // 0..5
-
-            if (globalCardIndex < 3) {
-                targetText = analysisData.theirFeelings.cards[globalCardIndex].desc;
-            } else {
-                targetText = analysisData.myFeelings.cards[globalCardIndex - 3].desc;
-            }
-
-            let charIndex = 0;
-            const interval = setInterval(() => {
-                charIndex++;
-                setTypedText(targetText.slice(0, charIndex));
-
-                if (charIndex >= targetText.length) {
-                    clearInterval(interval);
-
-                    // Boundary check: phases end at step 6 and 12.
-                    // If step is 6 or 12, don't auto-advance. Wait for user.
-                    if (step === 6 || step === 12) {
-                        return;
-                    }
-
-                    setTimeout(() => {
-                        setStep(prev => prev + 1);
-                    }, 2000);
-                }
-            }, 50); // Slower typing speed
-
-            return () => clearInterval(interval);
+            // Wait for user "Next" click for all text steps.
+            return;
         }
     }, [step, analysisData]);
 
     // Helper functions for UI
     const getIsFlipped = (group: 'THEIR' | 'MY', index: number) => {
+        // logic preserved if needed for legacy, or removed if unused. 
+        // Keeping it compatible for now but might be unused if we remove CardSection.
         if (group === 'THEIR') {
             const triggerStep = (index * 2) + 1;
             return step >= triggerStep;
@@ -103,14 +76,13 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
 
     const nextPhase = () => {
         setStep(prev => prev + 1);
-        setTypedText('');
     };
 
     const getCurrentTextInfo = () => {
-        if (!analysisData) return { section: '', name: '', desc: '' };
+        if (!analysisData) return { section: '', name: '', desc: '', cardId: null };
 
         // For summary phase
-        if (step > 12) return { section: '종합 분석', name: '', desc: '' };
+        if (step > 12) return { section: '종합 분석', name: '', desc: '', cardId: null };
 
         const globalCardIndex = Math.max(0, Math.min(Math.floor((step - 1) / 2), 5));
 
@@ -122,10 +94,14 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
             ? analysisData.theirFeelings.cards[localIndex]
             : analysisData.myFeelings.cards[localIndex];
 
+        // Get the actual card ID (0-21)
+        const cardId = isTheirTurn ? theirCards[localIndex] : myCards[localIndex];
+
         return {
             section: sectionTitle,
             name: cardData?.name || '',
-            desc: cardData?.desc || ''
+            desc: cardData?.desc || '',
+            cardId: cardId
         };
     };
 
@@ -134,9 +110,9 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
         loading,
         error,
         analysisData,
-        typedText,
         textInfo: getCurrentTextInfo(),
         isFinal: step >= 13,
+        isFlipStep: (step % 2 !== 0 && step < 13), // Export this
         getIsFlipped,
         nextPhase
     };

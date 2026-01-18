@@ -34,7 +34,6 @@ const Container = styled.div`
 const Title = styled.h1`
   font-family: 'GounBatang', serif;
   font-size: 3rem;
-  margin-bottom: 2rem;
 `
 
 function App() {
