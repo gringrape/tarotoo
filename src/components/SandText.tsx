@@ -13,18 +13,23 @@ const sandScatter = keyframes`
   }
 `;
 
-const Wrapper = styled.div`
+// \n 키워드가 줄바꿈이 되도록
+const Wrapper = styled.div<{ $isVisible: boolean }>`
   position: absolute;
   top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
-  gap: 0.1em;
-  font-family: 'KerisKeduLine', sans-serif;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3em;
+  font-family: 'GounBatang', serif;
   font-size: 1.5rem;
   color: white;
   pointer-events: none;
-  white-space: nowrap;
+  white-space: pre-line;
+  transition: opacity 0.5s ease-in-out;
+  opacity: ${props => props.$isVisible ? 1 : 0};
 `;
 
 const Char = styled.span<{ $delay: number }>`
@@ -34,21 +39,31 @@ const Char = styled.span<{ $delay: number }>`
   animation-delay: ${props => props.$delay}s;
 `;
 
+const LineBreak = styled.div`
+  flex-basis: 100%;
+  height: 0;
+`;
+
 interface SandTextProps {
-    text: string;
+  text: string;
+  isVisible?: boolean;
 }
 
-export function SandText({ text }: SandTextProps) {
-    return (
-        <Wrapper>
-            {text.split('').map((char, index) => (
-                <Char
-                    key={index}
-                    $delay={Math.random() * 2} // Random delay between 0 and 2s
-                >
-                    {char === ' ' ? '\u00A0' : char}
-                </Char>
-            ))}
-        </Wrapper>
-    );
+export function SandText({ text, isVisible = true }: SandTextProps) {
+  return (
+    <Wrapper $isVisible={isVisible}>
+      {text.split('').map((char, index) =>
+        char === '\n' ? (
+          <LineBreak key={index} />
+        ) : (
+          <Char
+            key={index}
+            $delay={Math.random() * 2} // Random delay between 0 and 2s
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </Char>
+        )
+      )}
+    </Wrapper>
+  );
 }

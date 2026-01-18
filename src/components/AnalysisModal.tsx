@@ -27,7 +27,7 @@ const ModalContent = styled(motion.div)`
 `;
 
 const Question = styled.h2`
-  font-family: 'KerisKeduLine', sans-serif;
+  font-family: 'GounBatang', serif;
   font-size: 2rem;
   margin-bottom: 3rem;
   color: #E0D4FC;
@@ -47,7 +47,7 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
   font-size: 1.1rem;
   border-radius: 50px;
   cursor: pointer;
-  font-family: 'Suit', sans-serif;
+  font-family: 'GounBatang', serif;
   transition: all 0.2s ease;
 
   &:hover {
@@ -60,9 +60,17 @@ interface AnalysisModalProps {
   isVisible: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  message?: string;
+  confirmText?: string;
 }
 
-export function AnalysisModal({ isVisible, onConfirm, onCancel }: AnalysisModalProps) {
+export function AnalysisModal({
+  isVisible,
+  onConfirm,
+  onCancel,
+  message = "분석을 시작할까요?",
+  confirmText = "네"
+}: AnalysisModalProps) {
   return (
     <AnimatePresence>
       {isVisible && (
@@ -77,10 +85,10 @@ export function AnalysisModal({ isVisible, onConfirm, onCancel }: AnalysisModalP
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           >
-            <Question>분석을 시작할까요?</Question>
+            <Question>{message}</Question>
             <ButtonGroup>
               <Button $variant="secondary" onClick={onCancel} data-testid="cancel-button">다시 고르기</Button>
-              <Button onClick={onConfirm} data-testid="confirm-button">네</Button>
+              <Button onClick={onConfirm} data-testid="confirm-button">{confirmText}</Button>
             </ButtonGroup>
           </ModalContent>
         </Backdrop>

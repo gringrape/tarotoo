@@ -14,7 +14,7 @@ export interface AnalysisResponse {
     overallStrategy: string;
 }
 
-const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3000';
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT ?? 'http://localhost:3000';
 
 export async function fetchAnalysis(theirCards: string[], myCards: string[]): Promise<AnalysisResponse> {
     const response = await fetch(`${API_ENDPOINT}/api/analyze`, {

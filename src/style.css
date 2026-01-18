@@ -1,7 +1,14 @@
 @font-face {
-    font-family: 'KerisKeduLine';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2601-3@1.0/KERISKEDU_Line.woff2') format('woff2');
+    font-family: 'GounBatang';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/GowunBatang-Regular.woff') format('woff');
     font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'GounBatang';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/GowunBatang-Bold.woff') format('woff');
+    font-weight: 700;
     font-display: swap;
 }
 
@@ -116,6 +123,8 @@ section {
 
 body {
     line-height: 1;
+    word-break: keep-all;
+    font-family: 'GounBatang', serif;
 }
 
 html,

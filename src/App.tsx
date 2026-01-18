@@ -4,6 +4,7 @@ import { CardDeck } from "./components/CardDeck"
 import { SandText } from "./components/SandText"
 import { AnalysisModal } from "./components/AnalysisModal"
 import { AnalysisResult } from "./components/AnalysisResult"
+import backImg from "./assets/background.jpg"
 
 const Container = styled.div`
   display: flex;
@@ -12,7 +13,18 @@ const Container = styled.div`
   justify-content: flex-start;
   height: 100vh;
   width: 100%;
-  background-color: #3E0075;
+  background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.8) 0%,
+      transparent 30%,
+      transparent 70%,
+      rgba(0, 0, 0, 0.8) 100%
+    ),
+    linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)),
+    url(${backImg});
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   color: white;
   padding: 4rem 0;
   box-sizing: border-box;
@@ -20,7 +32,7 @@ const Container = styled.div`
 `
 
 const Title = styled.h1`
-  font-family: 'KerisKeduLine', sans-serif;
+  font-family: 'GounBatang', serif;
   font-size: 3rem;
   margin-bottom: 2rem;
 `
@@ -65,8 +77,8 @@ function App() {
 
   // Dynamic Title/Prompt based on phase
   const getPromptText = () => {
-    if (phase === 'THEIR') return "나를 향한 상대방의 마음을 떠올리며<br/>카드 세 장을 선택해주세요.";
-    return "상대방을 향한 나의 마음을 떠올리며<br/>카드 세 장을 선택해주세요.";
+    if (phase === 'THEIR') return "나를 향한 상대방의 마음을 떠올리며\n 카드 세 장을 선택해주세요.";
+    return "상대방을 향한 나의 마음을 떠올리며\n 카드 세 장을 선택해주세요.";
   };
 
   return (
@@ -75,13 +87,18 @@ function App() {
 
       {phase !== 'ANALYSIS' ? (
         <>
-          {currentSelection.length < 3 && <SandText text={getPromptText()} />}
+          <SandText
+            text={getPromptText()}
+            isVisible={currentSelection.length === 0}
+          />
           <CardDeck selectedCards={currentSelection} onCardClick={handleCardClick} />
 
           <AnalysisModal
             isVisible={isSelectionComplete}
             onConfirm={handleConfirm}
             onCancel={handleReset}
+            message={phase === 'THEIR' ? "다음으로 진행할까요?" : "분석을 시작할까요?"}
+            confirmText={phase === 'THEIR' ? "네" : "분석하기"}
           />
         </>
       ) : (

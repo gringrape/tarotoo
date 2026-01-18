@@ -1,98 +1,117 @@
 
 
 describe('Tarot App E2E', () => {
+    let nextCardIndex = 0;
+
     beforeEach(() => {
+        nextCardIndex = 0;
         cy.visit('/');
     });
 
-    it('runs through the full tarot reading flow', () => {
-        // Mock the analysis API
+    // === Helper Steps ===
+    const mockApi = () => {
         cy.intercept('POST', '**/analyze', {
             statusCode: 200,
             body: {
                 theirFeelings: {
                     cards: [
-                        { name: 'Card 1', desc: 'Their Desc 1' },
-                        { name: 'Card 2', desc: 'Their Desc 2' },
-                        { name: 'Card 3', desc: 'Their Desc 3' }
+                        { name: 'Card A', desc: 'Their Desc A' },
+                        { name: 'Card B', desc: 'Their Desc B' },
+                        { name: 'Card C', desc: 'Their Desc C' }
                     ],
-                    summary: 'Their Summary'
+                    summary: 'Their Final Summary'
                 },
                 myFeelings: {
                     cards: [
-                        { name: 'Card 4', desc: 'My Desc 1' },
-                        { name: 'Card 5', desc: 'My Desc 2' },
-                        { name: 'Card 6', desc: 'My Desc 3' }
+                        { name: 'Card D', desc: 'My Desc D' },
+                        { name: 'Card E', desc: 'My Desc E' },
+                        { name: 'Card F', desc: 'My Desc F' }
                     ],
-                    summary: 'My Summary'
+                    summary: 'My Final Summary'
                 },
-                overallStrategy: 'Strategy'
+                overallStrategy: 'Final Strategy'
             },
-            delay: 1000 // Ensure loading state is visible
+            delay: 500
         }).as('analyzeParams');
+    };
 
-        // 1. Initial State
-        cy.contains('나를 향한 상대방의 마음을 떠올리며').should('be.visible');
+    const selectCards = ({ count }: { count: number }) => {
+        const startIndex = nextCardIndex;
+        nextCardIndex += count;
 
-        // Select 3 cards using test ids
-        cy.get('[data-testid="card-wrapper-0"]').click({ force: true });
-        cy.get('[data-testid="card-wrapper-1"]').click({ force: true });
-        cy.get('[data-testid="card-wrapper-2"]').click({ force: true });
+        cy.get('[data-testid^="card-wrapper-"]').then($cards => {
+            for (let i = 0; i < count; i++) {
+                cy.wrap($cards[startIndex + i]).click({ force: true });
+            }
+        });
+    };
 
-        // Modal appears
-        cy.contains('분석을 시작할까요?').should('be.visible');
+    const verifyModal = ({ message, confirmWith }: { message: string; confirmWith: string }) => {
+        cy.contains(message).should('be.visible');
+        cy.get('[data-testid="confirm-button"]').should('contain.text', confirmWith).click();
+    };
 
-        // Confirm
-        cy.get('[data-testid="confirm-button"]').click();
+    const verifyStage = ({ expectingText }: { expectingText: string }) => {
+        cy.contains(expectingText, { timeout: 30000 }).should('be.visible');
+    };
 
-        // 2. Second Phase
-        cy.contains('상대방을 향한 나의 마음을 떠올리며').should('be.visible');
+    const proceedToNextStage = () => {
+        cy.contains('button', '다음').should('be.visible').click();
+    };
 
-        // Select 3 cards again (indices 3, 4, 5)
-        cy.get('[data-testid="card-wrapper-3"]').click({ force: true });
-        cy.get('[data-testid="card-wrapper-4"]').click({ force: true });
-        cy.get('[data-testid="card-wrapper-5"]').click({ force: true });
+    const verifyFinalSummary = () => {
+        cy.contains('종합').should('be.visible');
+        cy.contains('Summary').should('be.visible');
+        cy.contains('Strategy').should('be.visible');
+    };
 
-        // Modal appears
-        cy.contains('분석을 시작할까요?').should('be.visible');
+    // === Tests ===
 
-        // Confirm
-        cy.get('[data-testid="confirm-button"]').click();
+    it('completes the full tarot reading flow with 3-stage analysis', () => {
+        mockApi();
 
-        // 3. Analysis Result
-        cy.contains('운명을 분석하고 있습니다...').should('be.visible');
+        // Phase 1: Their Cards
+        cy.contains('상대방').should('be.visible');
+        selectCards({ count: 3 });
+        verifyModal({ message: '다음', confirmWith: '네' });
 
-        // Wait for the API call
+        // Phase 2: My Cards
+        cy.contains('나의 마음').should('be.visible');
+        selectCards({ count: 3 });
+        verifyModal({ message: '분석', confirmWith: '분석' });
+
+        // Analysis
+        cy.contains('분석하고 있습니다').should('be.visible');
         cy.wait('@analyzeParams');
 
-        // Wait for results
-        // The typing effect takes time, so we might need to wait or check for final state
-        // We can check if "Their Desc 1" appears which is part of our mock
-        cy.contains('Their Desc 1', { timeout: 20000 }).should('be.visible');
-        cy.contains('나를 향한 상대방의 마음').should('be.visible');
-        cy.contains('상대방을 향한 나의 마음').should('be.visible');
+        // Stage 1
+        verifyStage({ expectingText: 'Their Desc C' });
+        proceedToNextStage();
+
+        // Stage 2
+        verifyStage({ expectingText: 'My Desc F' });
+        proceedToNextStage();
+
+        // Stage 3
+        verifyFinalSummary();
     });
 
-    it('allows cancelling selection in the modal', () => {
-        // Select 3 cards
-        cy.get('[data-testid="card-wrapper-0"]').click({ force: true });
-        cy.get('[data-testid="card-wrapper-1"]').click({ force: true });
-        cy.get('[data-testid="card-wrapper-2"]').click({ force: true });
+    it('handles cancellation in modal correctly', () => {
+        selectCards({ count: 3 });
+        cy.contains('다음').should('be.visible');
 
-        // Modal appears
-        cy.contains('분석을 시작할까요?').should('be.visible');
-
-        // Click Cancel
         cy.get('[data-testid="cancel-button"]').click();
+        cy.contains('다음').should('not.exist');
 
-        // Modal should disappear
-        cy.contains('분석을 시작할까요?').should('not.exist');
+        // Reset index because after cancel we need to re-select
+        // Wait, does cancellation reset the fact that we "used" those physical cards?
+        // In the app, they are deselected.
+        // So we can click the SAME cards again (0, 1, 2).
+        // Since my `nextCardIndex` only increments, I need to allow "resetting" or manual management if needed.
+        // OR, the test logic needs to "rewind" the index.
+        nextCardIndex -= 3;
 
-        // Selecting again should work
-        cy.get('[data-testid="card-wrapper-3"]').click({ force: true });
-        cy.get('[data-testid="card-wrapper-4"]').click({ force: true });
-        cy.get('[data-testid="card-wrapper-5"]').click({ force: true });
-
-        cy.contains('분석을 시작할까요?').should('be.visible');
+        selectCards({ count: 3 });
+        cy.contains('다음').should('be.visible');
     });
 });

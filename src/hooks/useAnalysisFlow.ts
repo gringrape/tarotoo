@@ -73,11 +73,18 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
 
                 if (charIndex >= targetText.length) {
                     clearInterval(interval);
+
+                    // Boundary check: phases end at step 6 and 12.
+                    // If step is 6 or 12, don't auto-advance. Wait for user.
+                    if (step === 6 || step === 12) {
+                        return;
+                    }
+
                     setTimeout(() => {
                         setStep(prev => prev + 1);
                     }, 2000);
                 }
-            }, 30);
+            }, 50); // Slower typing speed
 
             return () => clearInterval(interval);
         }
@@ -94,8 +101,16 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
         }
     };
 
+    const nextPhase = () => {
+        setStep(prev => prev + 1);
+        setTypedText('');
+    };
+
     const getCurrentTextInfo = () => {
         if (!analysisData) return { section: '', name: '', desc: '' };
+
+        // For summary phase
+        if (step > 12) return { section: '종합 분석', name: '', desc: '' };
 
         const globalCardIndex = Math.max(0, Math.min(Math.floor((step - 1) / 2), 5));
 
@@ -122,6 +137,7 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
         typedText,
         textInfo: getCurrentTextInfo(),
         isFinal: step >= 13,
-        getIsFlipped
+        getIsFlipped,
+        nextPhase
     };
 }
