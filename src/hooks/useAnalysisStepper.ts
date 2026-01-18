@@ -47,9 +47,10 @@ export const STEP_SEQUENCE = createStepSequence();
 
 interface UseAnalysisStepperProps {
     isDataReady: boolean;
+    isPaused?: boolean;
 }
 
-export function useAnalysisStepper({ isDataReady }: UseAnalysisStepperProps) {
+export function useAnalysisStepper({ isDataReady, isPaused = false }: UseAnalysisStepperProps) {
     const [stepIndex, setStepIndex] = useState(0);
 
     const currentStep = STEP_SEQUENCE[stepIndex] || { type: 'IDLE' }; // Safe fallback
@@ -58,6 +59,8 @@ export function useAnalysisStepper({ isDataReady }: UseAnalysisStepperProps) {
 
     // Auto-advance logic based on Step Definition, not index math
     useEffect(() => {
+        if (isPaused) return;
+
         if (currentStep.type === 'IDLE' && isDataReady) {
             const t = setTimeout(() => setStepIndex(1), TIMING.INITIAL_DELAY);
             return () => clearTimeout(t);
@@ -67,7 +70,7 @@ export function useAnalysisStepper({ isDataReady }: UseAnalysisStepperProps) {
             const t = setTimeout(nextPhase, TIMING.FLIP_ANIMATION);
             return () => clearTimeout(t);
         }
-    }, [stepIndex, isDataReady, currentStep]); // React to definition changes
+    }, [stepIndex, isDataReady, currentStep, isPaused]); // React to definition changes
 
     return {
         stepIndex,

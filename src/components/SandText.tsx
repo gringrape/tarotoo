@@ -35,7 +35,7 @@ const Wrapper = styled.div<{ $isVisible: boolean }>`
 const Char = styled.span<{ $delay: number }>`
   opacity: 0;
   display: inline-block;
-  animation: ${sandScatter} 2s forwards;
+  animation: ${sandScatter} .5s forwards;
   animation-delay: ${props => props.$delay}s;
 `;
 
@@ -58,7 +58,7 @@ export function SandText({ text, isVisible = true }: SandTextProps) {
         ) : (
           <Char
             key={index}
-            $delay={Math.random() * 2} // Random delay between 0 and 2s
+            $delay={.5} // Random delay between 0 and 2s
           >
             {char === ' ' ? '\u00A0' : char}
           </Char>

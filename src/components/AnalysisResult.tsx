@@ -72,7 +72,35 @@ const NextButton = styled.button`
   }
 `;
 
+const GuidanceOverlay = styled.div<{ $isVisible: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 500;
+  opacity: ${props => props.$isVisible ? 1 : 0};
+  pointer-events: ${props => props.$isVisible ? 'auto' : 'none'};
+  transition: opacity 0.5s ease-in-out;
+`;
+
+const GuidanceText = styled.div`
+  font-family: 'GounBatang', serif;
+  font-size: 2rem;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  text-align: center;
+`;
+
 export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [dismissedSteps, setDismissedSteps] = useState<number[]>([]);
+  const [isFlowPaused, setIsFlowPaused] = useState(false); // State to control flow pausing
+
   const {
     step,
     loading,
@@ -82,20 +110,42 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
     isFinal,
     isFlipStep,
     nextPhase
-  } = useAnalysisFlow({ theirCards, myCards });
+  } = useAnalysisFlow({
+    theirCards,
+    myCards,
+    isPaused: isFlowPaused // Pass the new state here
+  });
 
-  const [messageIndex, setMessageIndex] = useState(0);
+  // Helper to get guidance text based on step
+  const getGuidanceText = (currentStep: number) => {
+    if (currentStep === 1) return "먼저 상대방의 마음을 알아볼까요?";
+    if (currentStep === 7) return "이제 당신의 마음을 읽어볼게요";
+    if (currentStep === 13) return "결과를 종합해드릴게요";
+    return null;
+  };
 
+  const currentGuidanceText = getGuidanceText(step);
+  const showGuidance = !!currentGuidanceText && !dismissedSteps.includes(step);
+
+  // Update isFlowPaused based on showGuidance
+  useEffect(() => {
+    setIsFlowPaused(showGuidance);
+  }, [showGuidance]);
+
+  // Rotating Loading Messages
   useEffect(() => {
     if (!loading) return;
-
-    // Rotate messages every 3 seconds
     const interval = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % LOADING_MESSAGES.length);
     }, 3000);
-
     return () => clearInterval(interval);
   }, [loading]);
+
+  const handleDismissGuidance = () => {
+    if (currentGuidanceText) {
+      setDismissedSteps((prev) => [...prev, step]);
+    }
+  };
 
   if (loading) {
     return (
@@ -110,22 +160,33 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
 
   return (
     <Container>
-      <InfoBoard
-        isVisible={true}
-        isFinal={isFinal}
-        isFlipStep={isFlipStep}
-        textInfo={textInfo}
-        analysisData={analysisData}
-        error={error}
-        theirCards={theirCards}
-        myCards={myCards}
-        step={step}
-      />
+      <GuidanceOverlay
+        $isVisible={showGuidance}
+        onClick={handleDismissGuidance}
+      >
+        <GuidanceText>{currentGuidanceText}</GuidanceText>
+      </GuidanceOverlay>
 
-      {((step % 2 === 0 && step > 0 && step <= 12) || step === 13) && (
-        <NextButton onClick={nextPhase}>
-          다음으로
-        </NextButton>
+      {!showGuidance && step > 0 && (
+        <>
+          <InfoBoard
+            isVisible={true}
+            isFinal={isFinal}
+            isFlipStep={isFlipStep}
+            textInfo={textInfo}
+            analysisData={analysisData}
+            error={error}
+            theirCards={theirCards}
+            myCards={myCards}
+            step={step}
+          />
+
+          {((step % 2 === 0 && step > 0 && step <= 12) || step === 13) && (
+            <NextButton onClick={nextPhase}>
+              다음으로
+            </NextButton>
+          )}
+        </>
       )}
     </Container>
   );
