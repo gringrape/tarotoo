@@ -3,28 +3,75 @@ import { motion } from 'framer-motion';
 import { TarotCard } from '../TarotCard';
 import { TAROT_DATA } from '../../data/tarotData';
 import type { AnalysisSection } from '../../api/tarotApi';
-import { ScrollContent, ResultTitle, CardName, ResultDesc } from './styles';
+import { ScrollContent, ResultTitle, CardName, ResultDesc, RowWrapper, LeftCol, RightCol } from './styles';
 
-const SummaryGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.8rem;
-  width: 100%;
-  margin-bottom: 1.5rem;
-  justify-items: center;
+const LAYOUT_CONFIG = {
+    // Adjust these to control card size
+    CARD_SCALE_DESKTOP: '0.15rem',
+    CARD_SCALE_MOBILE: '0.1rem',
+
+    // Container dimensions (relative to scale)
+    FAN_WIDTH: '32em',
+    FAN_HEIGHT: '28em',
+} as const;
+
+// Container for the Fan Layout
+const FanContainer = styled.div`
+  position: relative;
+  width: ${LAYOUT_CONFIG.FAN_WIDTH};
+  height: ${LAYOUT_CONFIG.FAN_HEIGHT};
+  margin-top: 1rem;
+  z-index: 100;
+  
+  /* Allow cards to extend outside */
+  overflow: visible;
+
+  /* Reserving visual space for the spread so it doesn't hit ScrollContent edge */
+  margin: 0 2em; 
+
+  /* Scale down the whole fan assembly */
+  font-size: ${LAYOUT_CONFIG.CARD_SCALE_DESKTOP}; 
+
+  @media (max-width: 768px) {
+    width: 20em;
+    height: 18em;
+    font-size: ${LAYOUT_CONFIG.CARD_SCALE_MOBILE};
+    margin: 0 1em; /* Smaller margin on mobile */
+  }
 `;
 
-const SmallCardWrapper = styled.div`
-  font-size: 0.25em; /* Very small scale for summary */
-  width: 20em;
-  height: 35em;
-  position: relative;
-  
-  /* Ensure flip is static (front visible) */
+// Individual Card in the Fan
+const FannedCard = styled.div<{ index: number }>`
+  position: absolute;
+  width: 14em; /* Intrinsic card size */
+  aspect-ratio: 20/35;
+  top: 0;
+  left: 50%;
+  transform-origin: bottom center;
+  transition: transform 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+
+  /* Fan Logic based on index (0, 1, 2) */
+  ${({ index }) => {
+        if (index === 0) return `
+      z-index: 1;
+      transform: translateX(-110%) rotate(-15deg) translateY(2em);
+    `;
+        if (index === 1) return `
+      z-index: 10; /* Center card on top */
+      transform: translateX(-50%) translateY(0);
+    `;
+        if (index === 2) return `
+      z-index: 1;
+      transform: translateX(10%) rotate(15deg) translateY(2em);
+    `;
+    }}
+
+  /* Ensure card inside is visible */
   & > div {
     width: 100%;
     height: 100%;
-    transform: rotateY(180deg);
+    transform: rotateY(180deg); /* Show front */
     transform-style: preserve-3d;
   }
 `;
@@ -40,42 +87,57 @@ export function GridSummaryView({ theirCards, myCards, theirFeelings, myFeelings
     return (
         <ScrollContent key="step-13-grid">
             <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: 'spring' }}
-                style={{ width: '100%' }}
+                transition={{ duration: 0.5 }}
+                style={{ width: '100%', maxWidth: '1000px' }}
             >
                 <ResultTitle>종합 분석 결과</ResultTitle>
 
-                {/* Their Cards Grid */}
-                <div style={{ width: '100%', marginBottom: '2rem' }}>
-                    <CardName style={{ fontSize: '1.4em', marginBottom: '1rem' }}>나를 향한 상대방의 마음</CardName>
-                    <SummaryGrid>
-                        {theirCards.map((cardId, i) => (
-                            <SmallCardWrapper key={`their-${i}`}>
-                                <div>
-                                    <TarotCard image={TAROT_DATA[cardId].image} />
-                                </div>
-                            </SmallCardWrapper>
-                        ))}
-                    </SummaryGrid>
-                    <ResultDesc>{theirFeelings.summary}</ResultDesc>
-                </div>
+                {/* Section 1: Their Feelings */}
+                <RowWrapper style={{ alignItems: 'center', marginBottom: '4rem' }}>
+                    {/* Left: Fan Cards */}
+                    <LeftCol>
+                        <FanContainer>
+                            {theirCards.map((cardId, i) => (
+                                <FannedCard key={`their-${i}`} index={i}>
+                                    <div>
+                                        <TarotCard image={TAROT_DATA[cardId].image} />
+                                    </div>
+                                </FannedCard>
+                            ))}
+                        </FanContainer>
+                    </LeftCol>
 
-                {/* My Cards Grid */}
-                <div style={{ width: '100%', marginBottom: '2rem' }}>
-                    <CardName style={{ fontSize: '1.4em', marginBottom: '1rem' }}>상대방을 향한 나의 마음</CardName>
-                    <SummaryGrid>
-                        {myCards.map((cardId, i) => (
-                            <SmallCardWrapper key={`my-${i}`}>
-                                <div>
-                                    <TarotCard image={TAROT_DATA[cardId].image} />
-                                </div>
-                            </SmallCardWrapper>
-                        ))}
-                    </SummaryGrid>
-                    <ResultDesc>{myFeelings.summary}</ResultDesc>
-                </div>
+                    {/* Right: Text */}
+                    <RightCol>
+                        <CardName>나를 향한 상대방의 마음</CardName>
+                        <ResultDesc>{theirFeelings.summary}</ResultDesc>
+                    </RightCol>
+                </RowWrapper>
+
+                {/* Section 2: My Feelings */}
+                <RowWrapper style={{ alignItems: 'center' }}>
+                    {/* Left: Fan Cards */}
+                    <LeftCol>
+                        <FanContainer>
+                            {myCards.map((cardId, i) => (
+                                <FannedCard key={`my-${i}`} index={i}>
+                                    <div>
+                                        <TarotCard image={TAROT_DATA[cardId].image} />
+                                    </div>
+                                </FannedCard>
+                            ))}
+                        </FanContainer>
+                    </LeftCol>
+
+                    {/* Right: Text */}
+                    <RightCol>
+                        <CardName>상대방을 향한 나의 마음</CardName>
+                        <ResultDesc>{myFeelings.summary}</ResultDesc>
+                    </RightCol>
+                </RowWrapper>
+
             </motion.div>
         </ScrollContent>
     );

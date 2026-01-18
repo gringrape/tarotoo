@@ -30,7 +30,7 @@ export const RowWrapper = styled.div`
   align-items: flex-start;
   justify-content: center;
   width: 100%;
-  gap: 4rem;
+  gap: 3rem;
   margin-top: 2rem;
   
   @media (max-width: 768px) {
@@ -44,7 +44,7 @@ export const LeftCol = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 0 0 auto;
+  flex: 0 0 22%; /* Generous ratio for the card fan */
 `;
 
 export const RightCol = styled.div`
@@ -57,8 +57,8 @@ export const RightCol = styled.div`
 `;
 
 export const CardName = styled.h4`
-  font-size: 1.8em;
-  color: #FFD700;
+  font-size: 1.5em;
+  color: #ddd;
   margin: 0 0 1.5rem 0;
   font-weight: bold;
 `;

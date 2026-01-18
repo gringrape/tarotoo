@@ -1,5 +1,4 @@
 
-
 describe('Tarot App E2E', () => {
     let nextCardIndex = 0;
 
@@ -19,7 +18,7 @@ describe('Tarot App E2E', () => {
                         { name: 'Card B', desc: 'Their Desc B' },
                         { name: 'Card C', desc: 'Their Desc C' }
                     ],
-                    summary: 'Their Final Summary'
+                    summary: 'Their Final Summary' // Shown in Step 13
                 },
                 myFeelings: {
                     cards: [
@@ -27,11 +26,11 @@ describe('Tarot App E2E', () => {
                         { name: 'Card E', desc: 'My Desc E' },
                         { name: 'Card F', desc: 'My Desc F' }
                     ],
-                    summary: 'My Final Summary'
+                    summary: 'My Final Summary' // Shown in Step 13
                 },
-                overallStrategy: 'Final Strategy'
+                overallStrategy: 'Final Strategy' // Shown in Step 14
             },
-            delay: 500
+            delay: 100 // Fast response for test
         }).as('analyzeParams');
     };
 
@@ -51,23 +50,13 @@ describe('Tarot App E2E', () => {
         cy.get('[data-testid="confirm-button"]').should('contain.text', confirmWith).click();
     };
 
-    const verifyStage = ({ expectingText }: { expectingText: string }) => {
-        cy.contains(expectingText, { timeout: 30000 }).should('be.visible');
-    };
-
-    const proceedToNextStage = () => {
+    const proceedNext = () => {
         cy.contains('button', '다음').should('be.visible').click();
-    };
-
-    const verifyFinalSummary = () => {
-        cy.contains('종합').should('be.visible');
-        cy.contains('Summary').should('be.visible');
-        cy.contains('Strategy').should('be.visible');
     };
 
     // === Tests ===
 
-    it('completes the full tarot reading flow with 3-stage analysis', () => {
+    it('completes the full tarot reading flow with sequential analysis', () => {
         mockApi();
 
         // Phase 1: Their Cards
@@ -80,35 +69,63 @@ describe('Tarot App E2E', () => {
         selectCards({ count: 3 });
         verifyModal({ message: '분석', confirmWith: '분석' });
 
-        // Analysis
+        // Await Analysis
         cy.contains('분석하고 있습니다').should('be.visible');
         cy.wait('@analyzeParams');
 
-        // Stage 1
-        verifyStage({ expectingText: 'Their Desc C' });
-        proceedToNextStage();
+        // === Sequential Card Analysis (6 Cards) ===
+        // Expected Texts in order
+        const expectedTexts = [
+            'Their Desc A',
+            'Their Desc B',
+            'Their Desc C',
+            'My Desc D',
+            'My Desc E',
+            'My Desc F'
+        ];
 
-        // Stage 2
-        verifyStage({ expectingText: 'My Desc F' });
-        proceedToNextStage();
+        expectedTexts.forEach((text, index) => {
+            // Wait for Flip Step (Auto) -> Text Step (Manual)
+            // Flip step is odd (1, 3, 5...), Text step is even (2, 4, 6...)
+            // But from user perspective, we just wait for text to appear.
 
-        // Stage 3
-        verifyFinalSummary();
+            cy.contains(text, { timeout: 10000 }).should('be.visible');
+
+            // The "Next" button appears on text steps
+            if (index < 5) { // For first 5 cards
+                proceedNext();
+            } else {
+                // For the last card (6th), clicking next goes to Summary Grid
+                proceedNext();
+            }
+        });
+
+        // === Step 13: Summary Grid ===
+        cy.contains('종합 분석 결과').should('be.visible');
+        cy.contains('Their Final Summary').should('be.visible'); // Summary text included in Step 13
+        cy.contains('My Final Summary').should('be.visible');
+
+        // Verify we are NOT yet seeing the Strategy
+        cy.contains('최종 전략').should('not.exist');
+
+        // Advance to Step 14
+        proceedNext();
+
+        // === Step 14: Final Strategy ===
+        cy.contains('최종 전략').should('be.visible');
+        cy.contains('Final Strategy').should('be.visible');
     });
 
     it('handles cancellation in modal correctly', () => {
+        mockApi(); // Just in case
+        nextCardIndex = 0;
         selectCards({ count: 3 });
         cy.contains('다음').should('be.visible');
 
         cy.get('[data-testid="cancel-button"]').click();
         cy.contains('다음').should('not.exist');
 
-        // Reset index because after cancel we need to re-select
-        // Wait, does cancellation reset the fact that we "used" those physical cards?
-        // In the app, they are deselected.
-        // So we can click the SAME cards again (0, 1, 2).
-        // Since my `nextCardIndex` only increments, I need to allow "resetting" or manual management if needed.
-        // OR, the test logic needs to "rewind" the index.
+        // Reset local index tracker since UI deselected them
         nextCardIndex -= 3;
 
         selectCards({ count: 3 });
