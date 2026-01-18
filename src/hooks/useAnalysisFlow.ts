@@ -51,7 +51,7 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
         if (isFlipStep) {
             const t = setTimeout(() => {
                 setStep(prev => prev + 1);
-            }, 800); // Duration for flip animation
+            }, 1400); // Duration for flip animation (increased to match 1.2s spring)
             return () => clearTimeout(t);
         }
 
@@ -79,7 +79,7 @@ export function useAnalysisFlow({ theirCards, myCards }: UseAnalysisFlowProps) {
     };
 
     const getCurrentTextInfo = () => {
-        if (!analysisData) return { section: '', name: '', desc: '', cardId: null };
+        if (!analysisData || step === 0) return { section: '', name: '', desc: '', cardId: null };
 
         // For summary phase
         if (step > 12) return { section: '종합 분석', name: '', desc: '', cardId: null };

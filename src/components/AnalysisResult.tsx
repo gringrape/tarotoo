@@ -98,9 +98,12 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
         textInfo={textInfo}
         analysisData={analysisData}
         error={error}
+        theirCards={theirCards}
+        myCards={myCards}
+        step={step}
       />
 
-      {(step % 2 === 0 && step > 0 && step <= 12) && (
+      {((step % 2 === 0 && step > 0 && step <= 12) || step === 13) && (
         <NextButton onClick={nextPhase}>
           다음으로
         </NextButton>
