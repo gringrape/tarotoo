@@ -5,7 +5,7 @@ import type { AnalysisResponse } from '../api/tarotApi';
 const TextContainer = styled(motion.div)`
   width: 90%;
   max-width: 600px;
-  min-height: 200px;
+  height: 300px; 
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
   padding: 2rem;
@@ -15,11 +15,28 @@ const TextContainer = styled(motion.div)`
   text-align: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   position: sticky;
-  bottom: 2rem;
+  bottom: 8rem; 
   z-index: 10;
+  overflow-y: auto;
+
+  /* Custom Scrollbar */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(106, 13, 173, 0.5);
+    border-radius: 4px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(106, 13, 173, 0.8);
+  }
 `;
 
 const TypeLabel = styled.h3`
@@ -27,19 +44,23 @@ const TypeLabel = styled.h3`
   font-size: 1.5rem;
   color: #E0D4FC;
   margin-bottom: 0.5rem;
+  flex-shrink: 0;
 `;
 
 const CardName = styled.h4`
   font-size: 1.2rem;
   color: #FFD700;
   margin-bottom: 1rem;
+  flex-shrink: 0;
 `;
 
 const TypeText = styled.p`
   font-family: 'Suit', sans-serif;
   font-size: 1.1rem;
-  line-height: 1.6;
+  line-height: 1.8;
   white-space: pre-wrap;
+  word-break: break-word;
+  word-wrap: break-word;
 `;
 
 const ResultTitle = styled.h2`
@@ -47,12 +68,15 @@ const ResultTitle = styled.h2`
   font-size: 2rem;
   margin-bottom: 1rem;
   color: #FFD700;
+  flex-shrink: 0;
 `;
 
 const ResultDesc = styled.p`
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: 1.8;
   color: #ddd;
+  word-break: break-word;
+  white-space: pre-wrap;
 `;
 
 interface InfoBoardProps {

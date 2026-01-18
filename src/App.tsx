@@ -65,8 +65,8 @@ function App() {
 
   // Dynamic Title/Prompt based on phase
   const getPromptText = () => {
-    if (phase === 'THEIR') return "나를 향한 상대방의 마음을 떠올리며<br/>카드 세 장을 선택해주세요.";
-    return "상대방을 향한 나의 마음을 떠올리며<br/>카드 세 장을 선택해주세요.";
+    if (phase === 'THEIR') return "나를 향한 상대방의 마음을 떠올리며\n 카드 세 장을 선택해주세요.";
+    return "상대방을 향한 나의 마음을 떠올리며\n 카드 세 장을 선택해주세요.";
   };
 
   return (
@@ -75,13 +75,18 @@ function App() {
 
       {phase !== 'ANALYSIS' ? (
         <>
-          {currentSelection.length < 3 && <SandText text={getPromptText()} />}
+          <SandText
+            text={getPromptText()}
+            isVisible={currentSelection.length === 0}
+          />
           <CardDeck selectedCards={currentSelection} onCardClick={handleCardClick} />
 
           <AnalysisModal
             isVisible={isSelectionComplete}
             onConfirm={handleConfirm}
             onCancel={handleReset}
+            message={phase === 'THEIR' ? "다음으로 진행할까요?" : "분석을 시작할까요?"}
+            confirmText={phase === 'THEIR' ? "네" : "분석하기"}
           />
         </>
       ) : (

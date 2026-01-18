@@ -31,6 +31,36 @@ interface AnalysisResultProps {
     myCards: number[];
 }
 
+const NextButton = styled.button`
+  position: fixed;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  
+  background: #6A0dad;
+  color: white;
+  border: none;
+  padding: 1rem 3rem;
+  font-size: 1.2rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: 'Suit', sans-serif;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.2s ease;
+  animation: fadeIn 0.5s ease-in-out;
+
+  &:hover {
+    background: #800080;
+    transform: translateX(-50%) scale(1.05);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+`;
+
 export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
     const {
         step,
@@ -40,7 +70,8 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
         typedText,
         textInfo,
         isFinal,
-        getIsFlipped
+        getIsFlipped,
+        nextPhase
     } = useAnalysisFlow({ theirCards, myCards });
 
     if (loading) {
@@ -51,29 +82,42 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
         );
     }
 
+    const showTheirCards = step <= 6;
+    const showMyCards = step > 6 && step <= 12;
+    const canProceed = (step === 6 || step === 12);
+
     return (
         <Container>
-            <CardSection
-                title="나를 향한 상대방의 마음"
-                cards={theirCards}
-                isFlippedFn={(i) => getIsFlipped('THEIR', i)}
-            />
+            {showTheirCards && (
+                <CardSection
+                    title="나를 향한 상대방의 마음"
+                    cards={theirCards}
+                    isFlippedFn={(i) => getIsFlipped('THEIR', i)}
+                />
+            )}
 
-            <CardSection
-                title="상대방을 향한 나의 마음"
-                cards={myCards}
-                isFlippedFn={(i) => getIsFlipped('MY', i)}
-                delayStart={0.3}
-                extraStyle={{ marginBottom: '20vh' }}
-            />
+            {showMyCards && (
+                <CardSection
+                    title="상대방을 향한 나의 마음"
+                    cards={myCards}
+                    isFlippedFn={(i) => getIsFlipped('MY', i)}
+                    delayStart={0}
+                />
+            )}
 
             <InfoBoard
-                isVisible={step >= 2 || !!error}
+                isVisible={true}
                 isFinal={isFinal}
                 textInfo={{ ...textInfo, typedText }}
                 analysisData={analysisData}
                 error={error}
             />
+
+            {canProceed && (
+                <NextButton onClick={nextPhase}>
+                    다음으로
+                </NextButton>
+            )}
         </Container>
     );
 }
