@@ -59,6 +59,10 @@ describe('Tarot App E2E', () => {
     it('completes the full tarot reading flow with sequential analysis', () => {
         mockApi();
 
+        // Phase 0: Intro Screen
+        cy.contains('h1', '재회타로').should('be.visible');
+        cy.contains('button', '시작하기').should('be.visible').click();
+
         // Phase 1: Their Cards
         cy.contains('상대방').should('be.visible');
         selectCards({ count: 3 });
@@ -85,6 +89,22 @@ describe('Tarot App E2E', () => {
         ];
 
         expectedTexts.forEach((text, index) => {
+            // Handle Guidance Overlays
+            // Step 1 (Index 0): Start of Their Cards
+            if (index === 0) {
+                cy.contains('먼저 상대방의 마음을 알아볼까요?').should('be.visible').click();
+                cy.contains('먼저 상대방의 마음을 알아볼까요?').should('not.be.visible');
+            }
+
+            // Step 7 (Index 3): Start of My Cards
+            if (index === 3) {
+                // Wait for the transition to Step 7
+                // Previous step was index 2 (Card 3). We clicked Next.
+                // The overlay should appear.
+                cy.contains('이제 당신의 마음을 읽어볼게요').should('be.visible').click();
+                cy.contains('이제 당신의 마음을 읽어볼게요').should('not.be.visible');
+            }
+
             // Wait for Flip Step (Auto) -> Text Step (Manual)
             // Flip step is odd (1, 3, 5...), Text step is even (2, 4, 6...)
             // But from user perspective, we just wait for text to appear.
@@ -101,6 +121,10 @@ describe('Tarot App E2E', () => {
         });
 
         // === Step 13: Summary Grid ===
+        // Handle Guidance Overlay for Summary
+        cy.contains('결과를 종합해드릴게요').should('be.visible').click();
+        cy.contains('결과를 종합해드릴게요').should('not.be.visible');
+
         cy.contains('종합 분석 결과').should('be.visible');
         cy.contains('Their Final Summary').should('be.visible'); // Summary text included in Step 13
         cy.contains('My Final Summary').should('be.visible');
@@ -119,6 +143,10 @@ describe('Tarot App E2E', () => {
     it('handles cancellation in modal correctly', () => {
         mockApi(); // Just in case
         nextCardIndex = 0;
+
+        // Phase 0: Intro Screen (Dismiss)
+        cy.contains('button', '시작하기').scrollIntoView().should('be.visible').click();
+
         selectCards({ count: 3 });
         cy.contains('다음').should('be.visible');
 
