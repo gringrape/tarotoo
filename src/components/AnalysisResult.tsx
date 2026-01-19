@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useAnalysisFlow } from '../hooks/useAnalysisFlow';
 import { InfoBoard } from './InfoBoard';
 import { LoadingScene } from './Three/LoadingScene';
+import { theme } from '../styles/designSystem';
 
 const Container = styled.div`
   display: flex;
@@ -49,21 +50,23 @@ const NextButton = styled.button`
   transform: translateX(-50%);
   z-index: 100;
   
-  background: #6A0dad;
-  color: white;
+  background: ${theme.colors.primary};
+  color: ${theme.colors.text.dark};
   border: none;
   padding: 1rem 3rem;
   font-size: 1.2rem;
   border-radius: 50px;
   cursor: pointer;
-  font-family: 'GounBatang', serif;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  font-family: ${theme.fonts.main};
+  font-weight: bold;
+  box-shadow: 0 4px 15px ${theme.colors.primaryShadow};
   transition: all 0.2s ease;
   animation: fadeIn 0.5s ease-in-out;
 
   &:hover {
-    background: #800080;
+    background: ${theme.colors.primaryHover};
     transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 0 25px ${theme.colors.primaryShadow};
   }
 
   @keyframes fadeIn {
