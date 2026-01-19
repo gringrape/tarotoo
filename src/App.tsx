@@ -1,11 +1,12 @@
 import styled from "styled-components"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { IntroScreen } from "./components/IntroScreen"
 import { CardDeck } from "./components/CardDeck"
 import { SandText } from "./components/SandText"
 import { AnalysisModal } from "./components/AnalysisModal"
 import { AnalysisResult } from "./components/AnalysisResult"
 import backImg from "./assets/background.jpg"
+import { trackPageView } from "./utils/analytics"
 
 const Container = styled.div`
   display: flex;
@@ -41,6 +42,16 @@ function App() {
   const [theirCards, setTheirCards] = useState<number[]>([]);
   const [myCards, setMyCards] = useState<number[]>([]);
   const [phase, setPhase] = useState<'INTRO' | 'THEIR' | 'MY' | 'ANALYSIS'>('INTRO');
+
+  useEffect(() => {
+    const pathMap = {
+      'INTRO': '/',
+      'THEIR': '/select/their-cards',
+      'MY': '/select/my-cards',
+      'ANALYSIS': '/analysis/result'
+    };
+    trackPageView(pathMap[phase]);
+  }, [phase]);
 
   const handleCardClick = (index: number) => {
     if (phase === 'ANALYSIS' || phase === 'INTRO') return;

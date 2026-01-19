@@ -1,10 +1,8 @@
 /*
 Run this to identify node names in the console.
 */
-import React, { useEffect } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
 
 export function ClockModel() {
     const { scene, nodes } = useGLTF('/models/classic_clock.glb');
