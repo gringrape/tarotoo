@@ -7,7 +7,7 @@ import { useFrame } from '@react-three/fiber';
 export function ClockModel() {
     const { scene, nodes } = useGLTF('/models/classic_clock.glb');
 
-    useFrame((state, delta) => {
+    useFrame((_, delta) => {
         // Cast to any to access dynamic node properties
         const n = nodes as any;
         // Final Animation: Object_4 (Hand 1) and Object_5 (Hand 2) with acceleration
