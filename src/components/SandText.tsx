@@ -32,11 +32,16 @@ const Wrapper = styled.div<{ $isVisible: boolean }>`
   opacity: ${props => props.$isVisible ? 1 : 0};
 `;
 
-const Char = styled.span<{ $delay: number }>`
+const Char = styled.span<{ $delay: number; $isHighlight?: boolean }>`
   opacity: 0;
   display: inline-block;
   animation: ${sandScatter} .5s forwards;
   animation-delay: ${props => props.$delay}s;
+  
+  ${props => props.$isHighlight && `
+    color: #00FFD1;
+    font-weight: bold;
+  `}
 `;
 
 const LineBreak = styled.div`
@@ -50,17 +55,31 @@ interface SandTextProps {
 }
 
 export function SandText({ text, isVisible = true }: SandTextProps) {
+  // Parse text for highlights: "normal *highlight* normal"
+  // Split by "*" -> ["normal ", "highlight", " normal"]
+  const segments = text.split('*');
+
+  // Convert to flat list of characters with highlight info
+  const charList: { char: string; isHighlight: boolean }[] = [];
+
+  segments.forEach((seg, i) => {
+    const isHighlight = i % 2 === 1; // Odd indices are highlighted parts
+    const chars = seg.split('');
+    chars.forEach(c => charList.push({ char: c, isHighlight }));
+  });
+
   return (
     <Wrapper $isVisible={isVisible}>
-      {text.split('').map((char, index) =>
-        char === '\n' ? (
+      {charList.map((item, index) =>
+        item.char === '\n' ? (
           <LineBreak key={index} />
         ) : (
           <Char
             key={index}
-            $delay={.5} // Random delay between 0 and 2s
+            $delay={.5} // Random delay between 0 and 2s (fixed at .5 for now per original code)
+            $isHighlight={item.isHighlight}
           >
-            {char === ' ' ? '\u00A0' : char}
+            {item.char === ' ' ? '\u00A0' : item.char}
           </Char>
         )
       )}

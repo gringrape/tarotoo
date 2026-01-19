@@ -20,6 +20,9 @@ const Title = styled.h1`
 `;
 
 const Description = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   font-family: 'GounBatang', serif;
   font-size: 1.5rem;
   color: #E0D4FC; /* Light Lavender */
@@ -62,10 +65,12 @@ export function IntroScreen({ onStart }: IntroScreenProps) {
     <Container>
       <Title>재회타로</Title>
       <Description>
-        <Highlight>당신의 마음</Highlight>과 <Highlight>그 사람의 마음</Highlight>,<br />
-        그리고 <Highlight>우리의 운명</Highlight>을 알아보세요.<br />
-        <br />
-        세 장의 카드가 당신의 이야기를 들려줍니다.
+        <div>
+          <Highlight>나의 마음</Highlight>과 <Highlight>상대방의 마음</Highlight>을 떠올리며,
+        </div>
+        <div>
+          <Highlight>카드를</Highlight> 선택해봅시다.
+        </div>
       </Description>
       <StartButton onClick={onStart}>시작하기</StartButton>
     </Container>

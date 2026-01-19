@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 import { ScrollContent, ResultTitle, CardName, ResultDesc } from './styles';
 
 interface StrategyViewProps {
@@ -18,7 +19,11 @@ export function StrategyView({ overallStrategy }: StrategyViewProps) {
 
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '2rem', marginTop: '1rem' }}>
                     <CardName>종합 전략</CardName>
-                    <ResultDesc>{overallStrategy}</ResultDesc>
+                    <ResultDesc>
+                        <ReactMarkdown>
+                            {overallStrategy}
+                        </ReactMarkdown>
+                    </ResultDesc>
                 </div>
             </motion.div>
         </ScrollContent>

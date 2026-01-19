@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { theme } from '../styles/designSystem';
 
 const Backdrop = styled(motion.div)`
   position: fixed;
@@ -7,30 +8,34 @@ const Backdrop = styled(motion.div)`
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.3);
+  background: ${theme.colors.background.overlay};
   backdrop-filter: blur(5px);
-  z-index: 2000; /* Higher than selected cards (1000+) */
+  z-index: 2000;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
 const ModalContent = styled(motion.div)`
-  background: rgba(20, 10, 40, 0.9);
+  background: ${theme.colors.background.modal};
   padding: 3rem 4rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid ${theme.colors.border};
   border-radius: 20px;
-  box-shadow: 0 0 30px rgba(138, 43, 226, 0.3);
+  box-shadow: 0 0 30px ${theme.colors.primaryShadow};
   text-align: center;
-  color: white;
+  color: ${theme.colors.text.main};
   min-width: 300px;
 `;
 
 const Question = styled.h2`
-  font-family: 'GounBatang', serif;
+  font-family: ${theme.fonts.main};
   font-size: 2rem;
   margin-bottom: 3rem;
-  color: #E0D4FC;
+  color: ${theme.colors.text.sub};
+  
+  strong {
+    color: ${theme.colors.primary};
+  }
 `;
 
 const ButtonGroup = styled.div`
@@ -40,19 +45,23 @@ const ButtonGroup = styled.div`
 `;
 
 const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
-  background: ${props => props.$variant === 'secondary' ? 'transparent' : '#6A0dad'};
-  border: 1px solid ${props => props.$variant === 'secondary' ? '#aaa' : '#6A0dad'};
-  color: ${props => props.$variant === 'secondary' ? '#ccc' : 'white'};
-  padding: 0.8rem 2rem;
+  background: ${props => props.$variant === 'secondary' ? 'transparent' : theme.colors.primary};
+  border: 1px solid ${props => props.$variant === 'secondary' ? theme.colors.border : theme.colors.primary};
+  color: ${props => props.$variant === 'secondary' ? theme.colors.text.main : theme.colors.text.dark};
+  padding: 0.8rem 2.5rem;
   font-size: 1.1rem;
   border-radius: 50px;
   cursor: pointer;
-  font-family: 'GounBatang', serif;
+  font-family: ${theme.fonts.main};
+  font-weight: bold;
   transition: all 0.2s ease;
+  box-shadow: ${props => props.$variant === 'secondary' ? 'none' : `0 4px 15px ${theme.colors.primaryShadow}`};
 
   &:hover {
-    background: ${props => props.$variant === 'secondary' ? 'rgba(255,255,255,0.1)' : '#800080'};
+    background: ${props => props.$variant === 'secondary' ? 'rgba(255,255,255,0.1)' : theme.colors.primaryHover};
     transform: scale(1.05);
+    box-shadow: ${props => props.$variant === 'secondary' ? 'none' : `0 0 25px ${theme.colors.primaryShadow}`};
+    border-color: ${props => props.$variant === 'secondary' ? theme.colors.text.main : theme.colors.primaryHover};
   }
 `;
 
@@ -85,7 +94,7 @@ export function AnalysisModal({
             exit={{ scale: 0.8, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           >
-            <Question>{message}</Question>
+            <Question dangerouslySetInnerHTML={{ __html: message.replace(/\*(.*?)\*/g, '<strong>$1</strong>') }} />
             <ButtonGroup>
               <Button $variant="secondary" onClick={onCancel} data-testid="cancel-button">다시 고르기</Button>
               <Button onClick={onConfirm} data-testid="confirm-button">{confirmText}</Button>

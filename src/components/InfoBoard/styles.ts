@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { theme } from '../../styles/designSystem';
 
 export const ScrollContent = styled.div`
   width: 100%;
@@ -19,7 +20,7 @@ export const ScrollContent = styled.div`
     border-radius: 3px;
   }
   &::-webkit-scrollbar-thumb {
-    background: rgba(106, 13, 173, 0.5);
+    background: ${theme.colors.primaryShadow};
     border-radius: 3px;
   }
 `;
@@ -58,43 +59,43 @@ export const RightCol = styled.div`
 
 export const CardName = styled.h4`
   font-size: 1.5em;
-  color: #ddd;
+  color: ${theme.colors.primary};
   margin: 0 0 1.5rem 0;
   font-weight: bold;
 `;
 
 export const ResultTitle = styled.h2`
-  font-family: 'GounBatang', serif;
+  font-family: ${theme.fonts.main};
   font-size: 2em;
   margin-bottom: 1rem;
-  color: #FFD700;
+  color: ${theme.colors.text.highlight};
   flex-shrink: 0;
 `;
 
-export const ResultDesc = styled.p`
+export const ResultDesc = styled.div`
   font-size: 1em;
   line-height: 1.8;
-  color: #ddd;
+  color: ${theme.colors.text.main};
   word-break: keep-all;
-  word-wrap: break-word;
-  white-space: pre-wrap;
+  word-wrap: break-word; /* Ensure compatibility */
+  // white-space: pre-wrap; /* Removing simple whitespace handling for markdown-ready container or keep for simple text */
 `;
 
 export const TypeLabel = styled.h3`
-  font-family: 'GounBatang', serif;
+  font-family: ${theme.fonts.main};
   font-size: 1.5em;
-  color: #E0D4FC;
+  color: ${theme.colors.text.sub};
   opacity: 0.9;
   margin: 0;
   margin-bottom: 0.5rem;
 `;
 
 export const TypeText = styled(motion.p)`
-  font-family: 'GounBatang', serif;
+  font-family: ${theme.fonts.main};
   font-size: 1.3em;
   line-height: 1.8;
   white-space: pre-wrap;
   word-break: keep-all;
-  color: #fff;
+  color: ${theme.colors.text.main};
   text-align: left;
 `;
