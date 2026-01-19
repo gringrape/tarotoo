@@ -159,4 +159,60 @@ describe('Tarot App E2E', () => {
         selectCards({ count: 3 });
         cy.contains('다음').should('be.visible');
     });
+
+    describe('Credit System', () => {
+        it('should show credit modal on 403 and allow recovery via email', () => {
+            // 1. Setup Intercepts
+            cy.intercept('POST', '**/api/users', { statusCode: 201, body: { userId: 'test-user', credits: 0 } }).as('createUser');
+
+            // Force 403 on first analysis
+            cy.intercept('POST', '**/api/analyze', {
+                statusCode: 403,
+                body: { message: 'Insufficient credits' }
+            }).as('analyzeFail');
+
+            // Success on email register
+            cy.intercept('POST', '**/api/users/register-email', {
+                statusCode: 200,
+                body: { success: true, credits: 2 }
+            }).as('registerEmail');
+
+            // Success Analysis Mock
+            cy.intercept('POST', '**/api/analyze', {
+                statusCode: 200,
+                body: {
+                    theirFeelings: { cards: [{ name: 'A', desc: 'A' }], summary: 'Test Summary' },
+                    myFeelings: { cards: [{ name: 'B', desc: 'B' }], summary: 'Test Summary' },
+                    overallStrategy: 'Success Strategy'
+                }
+            }).as('analyzeSuccess');
+
+            cy.visit('/');
+            cy.contains('시작하기').click();
+
+            // 2. Select Cards (Their)
+            selectCards({ count: 3 });
+            verifyModal({ message: '다음', confirmWith: '네' });
+
+            // 3. Select Cards (My)
+            selectCards({ count: 3 });
+
+            // Trigger Analysis
+            cy.contains('button', '분석').should('be.visible').click();
+            cy.contains('결과를 보시겠습니까?').should('be.visible');
+            cy.get('[data-testid="confirm-button"]').click();
+
+            cy.wait('@analyzeFail');
+
+            // 4. Verify Credit Modal
+            cy.contains('사용 횟수 초과').should('be.visible');
+            cy.get('input[type="email"]').type('test@example.com');
+            cy.contains('이메일 등록하고 계속하기').click();
+
+            // 5. Verify Recovery
+            cy.wait('@registerEmail');
+            cy.wait('@analyzeSuccess');
+            cy.contains('사용 횟수 초과').should('not.exist');
+        });
+    });
 });

@@ -6,11 +6,12 @@ interface UseAnalysisFlowProps {
     theirCards: number[];
     myCards: number[];
     isPaused?: boolean;
+    userId: string | null;
 }
 
-export function useAnalysisFlow({ theirCards, myCards, isPaused }: UseAnalysisFlowProps) {
+export function useAnalysisFlow({ theirCards, myCards, isPaused, userId }: UseAnalysisFlowProps) {
     // 1. Data Fetching
-    const { analysisData, loading, error } = useAnalysisData({ theirCards, myCards });
+    const { analysisData, loading, error, retry } = useAnalysisData({ theirCards, myCards, userId });
 
     // 2. Step Management
     const { stepIndex: step, currentStep, nextPhase, isFlipStep, isFinal } = useAnalysisStepper({
@@ -34,7 +35,8 @@ export function useAnalysisFlow({ theirCards, myCards, isPaused }: UseAnalysisFl
         textInfo: cardInfo || { section: '', name: '', desc: '', cardId: null },
         isFinal,
         isFlipStep,
-        nextPhase
+        nextPhase,
+        retry
     };
 }
 

@@ -4,6 +4,9 @@ import { useAnalysisFlow } from '../hooks/useAnalysisFlow';
 import { InfoBoard } from './InfoBoard';
 import { LoadingScene } from './Three/LoadingScene';
 import { theme } from '../styles/designSystem';
+import { useUser } from '../hooks/useUser';
+import { registerEmail } from '../api/tarotApi';
+import { CreditModal } from './CreditModal';
 
 const Container = styled.div`
   display: flex;
@@ -103,6 +106,8 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
   const [messageIndex, setMessageIndex] = useState(0);
   const [dismissedSteps, setDismissedSteps] = useState<number[]>([]);
   const [isFlowPaused, setIsFlowPaused] = useState(false); // State to control flow pausing
+  const [showCreditModal, setShowCreditModal] = useState(false);
+  const { userId, updateCredits } = useUser();
 
   const {
     step,
@@ -112,12 +117,36 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
     textInfo,
     isFinal,
     isFlipStep,
-    nextPhase
+    nextPhase,
+    retry
   } = useAnalysisFlow({
     theirCards,
     myCards,
-    isPaused: isFlowPaused // Pass the new state here
+    isPaused: isFlowPaused, // Pass the new state here
+    userId
   });
+
+  useEffect(() => {
+    if (error === 'CREDIT_LIMIT') {
+      setShowCreditModal(true);
+    }
+  }, [error]);
+
+  const handleRegisterEmail = async (email: string) => {
+    if (!userId) return;
+    const result = await registerEmail(userId, email);
+    if (result.success) {
+      updateCredits(result.credits);
+      setShowCreditModal(false);
+      retry(); // Retry analysis instead of reloading
+    }
+  };
+
+  const handleCancelCredit = () => {
+    // Navigate home or just reload to reset
+    window.location.reload(); // Simple reset
+  };
+
 
   // Helper to get guidance text based on step
   const getGuidanceText = (currentStep: number) => {
@@ -170,7 +199,13 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
         <GuidanceText>{currentGuidanceText}</GuidanceText>
       </GuidanceOverlay>
 
-      {!showGuidance && step > 0 && (
+      <CreditModal
+        isVisible={showCreditModal}
+        onRegister={handleRegisterEmail}
+        onCancel={handleCancelCredit}
+      />
+
+      {!showGuidance && step > 0 && !showCreditModal && (
         <>
           <InfoBoard
             isVisible={true}
@@ -178,13 +213,13 @@ export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {
             isFlipStep={isFlipStep}
             textInfo={textInfo}
             analysisData={analysisData}
-            error={error}
+            error={error === 'CREDIT_LIMIT' ? '크레딧이 부족합니다.' : error}
             theirCards={theirCards}
             myCards={myCards}
             step={step}
           />
 
-          {((step % 2 === 0 && step > 0 && step <= 12) || step === 13) && (
+          {((step % 2 === 0 && step > 0 && step <= 12) || step === 13) && !error && (
             <NextButton onClick={nextPhase}>
               다음으로
             </NextButton>
