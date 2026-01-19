@@ -77,8 +77,8 @@ function App() {
 
   // Dynamic Title/Prompt based on phase
   const getPromptText = () => {
-    if (phase === 'THEIR') return "나를 향한 상대방의 마음을 떠올리며\n 카드 세 장을 선택해주세요.";
-    return "상대방을 향한 나의 마음을 떠올리며\n 카드 세 장을 선택해주세요.";
+    if (phase === 'THEIR') return "나를 향한 *상대방의 마음*을 떠올리며\n *카드 세 장*을 선택해주세요.";
+    return "상대방을 향한 *나의 마음*을 떠올리며\n *카드 세 장*을 선택해주세요.";
   };
 
   if (phase === 'INTRO') {
