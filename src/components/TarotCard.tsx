@@ -7,6 +7,7 @@ const Scene = styled.div`
   width: 20em;
   aspect-ratio: 20 / 35;
   perspective: 1000px; /* 관찰자 시점의 거리 */
+  transform-style: preserve-3d;
 `;
 
 // Card: 실제 회전하는 컨테이너입니다.

@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node mock-server.cjs & vite",
+    "start": "VITE_API_ENDPOINT=http://localhost:3000 vite",
+    "dev": "node mock-server.cjs & VITE_API_ENDPOINT= vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -12,10 +13,14 @@
     "test:e2e:open": "cypress open"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.5.0",
+    "@types/three": "^0.182.0",
     "framer-motion": "^12.26.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "styled-components": "^6.3.6"
+    "styled-components": "^6.3.6",
+    "three": "^0.182.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

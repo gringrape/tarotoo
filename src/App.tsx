@@ -1,5 +1,6 @@
 import styled from "styled-components"
 import { useState } from "react"
+import { IntroScreen } from "./components/IntroScreen"
 import { CardDeck } from "./components/CardDeck"
 import { SandText } from "./components/SandText"
 import { AnalysisModal } from "./components/AnalysisModal"
@@ -34,16 +35,15 @@ const Container = styled.div`
 const Title = styled.h1`
   font-family: 'GounBatang', serif;
   font-size: 3rem;
-  margin-bottom: 2rem;
 `
 
 function App() {
   const [theirCards, setTheirCards] = useState<number[]>([]);
   const [myCards, setMyCards] = useState<number[]>([]);
-  const [phase, setPhase] = useState<'THEIR' | 'MY' | 'ANALYSIS'>('THEIR');
+  const [phase, setPhase] = useState<'INTRO' | 'THEIR' | 'MY' | 'ANALYSIS'>('INTRO');
 
   const handleCardClick = (index: number) => {
-    if (phase === 'ANALYSIS') return;
+    if (phase === 'ANALYSIS' || phase === 'INTRO') return;
 
     const isTheirTurn = phase === 'THEIR';
     const currentCards = isTheirTurn ? theirCards : myCards;
@@ -80,6 +80,14 @@ function App() {
     if (phase === 'THEIR') return "나를 향한 상대방의 마음을 떠올리며\n 카드 세 장을 선택해주세요.";
     return "상대방을 향한 나의 마음을 떠올리며\n 카드 세 장을 선택해주세요.";
   };
+
+  if (phase === 'INTRO') {
+    return (
+      <Container style={{ justifyContent: 'center' }}>
+        <IntroScreen onStart={() => setPhase('THEIR')} />
+      </Container>
+    );
+  }
 
   return (
     <Container>
