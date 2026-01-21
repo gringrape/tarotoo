@@ -78,6 +78,7 @@ export const ResultDesc = styled.div`
   color: ${theme.colors.text.main};
   word-break: keep-all;
   word-wrap: break-word; /* Ensure compatibility */
+  text-align: left;
   // white-space: pre-wrap; /* Removing simple whitespace handling for markdown-ready container or keep for simple text */
 `;
 
