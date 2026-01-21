@@ -24,12 +24,19 @@ const SELECTION_CONFIG = {
   DESKTOP: {
     SCALE: 0.9,
     GAP_PERCENT: 100,
-    Y_OFFSET: '-50vh',
+    // Position relative to the deck arc (deck-y-offset is -8em)
+    // Moving up by 30em (card height approx 35em) places it nicely above
+    Y_OFFSET: 'calc(var(--deck-y-offset) - 40em)',
   },
   MOBILE: {
     SCALE: 0.95,
     GAP_PERCENT: 100,
-    Y_OFFSET: '-60vh',
+    // Mobile deck is already very high (-40em).
+    // Note: Mobile viewport height interactions are tricky.
+    // Let's try relative first, but maybe sticking to a safe top offset is better?
+    // Actually, user asked for relative. 
+    // If deck is at -40em, and we subtract 20em -> -60em.
+    Y_OFFSET: 'calc(var(--deck-y-offset) - 70em)',
   }
 };
 
