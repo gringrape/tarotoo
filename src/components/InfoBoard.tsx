@@ -17,7 +17,7 @@ const TextContainer = styled(motion.div)`
   padding: 3rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: -10vh;
+  margin-top: 5vh;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -27,6 +27,7 @@ const TextContainer = styled(motion.div)`
 
   ${theme.media.mobile} {
     width: 80vw;
+    margin-top: -10vh;
     padding: 1.5rem;
     max-height: calc(100vh - 200px); /* Leave ample room for bottom button */
     overflow-y: auto; /* Allow entire container to scroll */
