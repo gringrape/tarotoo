@@ -38,12 +38,12 @@ export const theme = {
             mobile: '3rem',
         },
         subTitle: {
-            desktop: '2.5rem',
-            mobile: '2rem',
+            desktop: '2rem',
+            mobile: '1.4rem',
         },
         body: {
             desktop: '1.5rem',
-            mobile: '1rem',
+            mobile: '1.3rem',
         },
         button: {
             desktop: '1.5rem',

@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components';
+import { theme } from '../styles/designSystem';
 
 const sandScatter = keyframes`
   0% {
@@ -24,12 +25,18 @@ const Wrapper = styled.div<{ $isVisible: boolean }>`
   justify-content: center;
   gap: 0.3em;
   font-family: 'GounBatang', serif;
-  font-size: 1.5rem;
+  font-size: ${theme.typography.subTitle.desktop};
   color: white;
   pointer-events: none;
   white-space: pre-line;
   transition: opacity 0.5s ease-in-out;
   opacity: ${props => props.$isVisible ? 1 : 0};
+
+  ${theme.media.mobile} {
+    font-size: ${theme.typography.subTitle.mobile};
+    top: 30%; /* Raise slightly on mobile */
+    width: 90%; /* Prevent overflow */
+  }
 `;
 
 const Char = styled.span<{ $delay: number; $isHighlight?: boolean }>`
