@@ -25,5 +25,29 @@ export const theme = {
 
     fonts: {
         main: "'GounBatang', serif",
+    },
+
+    media: {
+        mobile: '@media (max-width: 768px)',
+        tablet: '@media (max-width: 1024px)',
+    },
+
+    typography: {
+        heading: {
+            desktop: '4rem',
+            mobile: '3rem',
+        },
+        subTitle: {
+            desktop: '2.5rem',
+            mobile: '2rem',
+        },
+        body: {
+            desktop: '1.5rem',
+            mobile: '1rem',
+        },
+        button: {
+            desktop: '1.5rem',
+            mobile: '1.2rem',
+        }
     }
 };
