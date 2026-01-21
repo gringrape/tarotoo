@@ -79,7 +79,46 @@ export const ResultDesc = styled.div`
   word-break: keep-all;
   word-wrap: break-word; /* Ensure compatibility */
   text-align: left;
-  // white-space: pre-wrap; /* Removing simple whitespace handling for markdown-ready container or keep for simple text */
+  
+  /* Markdown Styles */
+  h1, h2, h3 {
+    color: ${theme.colors.text.highlight};
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  h1 { font-size: 1.8em; }
+  h2 { font-size: 1.5em; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; }
+  h3 { font-size: 1.2em; color: ${theme.colors.primary}; }
+
+  p {
+    margin-bottom: 1.2rem;
+    line-height: 1.8;
+  }
+
+  ul, ol {
+    margin-bottom: 1.2rem;
+    padding-left: 1.5rem;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+    line-height: 1.7;
+  }
+
+  strong {
+    color: ${theme.colors.primary};
+    font-weight: bold;
+  }
+
+  blockquote {
+    border-left: 4px solid ${theme.colors.primary};
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: ${theme.colors.text.sub};
+  }
 `;
 
 export const TypeLabel = styled.h3`
