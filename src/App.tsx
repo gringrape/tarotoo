@@ -7,6 +7,7 @@ import { AnalysisModal } from "./components/AnalysisModal"
 import { AnalysisResult } from "./components/AnalysisResult"
 import backImg from "./assets/background.jpg"
 import { trackPageView } from "./utils/analytics"
+import { useUser } from "./hooks/useUser"
 
 const Container = styled.div`
   display: flex;
@@ -42,6 +43,7 @@ function App() {
   const [theirCards, setTheirCards] = useState<number[]>([]);
   const [myCards, setMyCards] = useState<number[]>([]);
   const [phase, setPhase] = useState<'INTRO' | 'THEIR' | 'MY' | 'ANALYSIS'>('INTRO');
+  const { resetUser } = useUser();
 
   useEffect(() => {
     const pathMap = {
@@ -103,6 +105,7 @@ function App() {
   return (
     <Container>
       <Title>재회타로</Title>
+      <DevControls onReset={resetUser} />
 
       {phase !== 'ANALYSIS' ? (
         <>
@@ -125,6 +128,31 @@ function App() {
       )}
     </Container>
   )
+}
+
+function DevControls({ onReset }: { onReset: () => void }) {
+  if (!import.meta.env.DEV) return null;
+
+  return (
+    <button
+      onClick={onReset}
+      style={{
+        position: 'fixed',
+        bottom: '10px',
+        right: '10px',
+        padding: '5px 10px',
+        background: 'rgba(255, 0, 0, 0.5)',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px',
+        fontSize: '10px',
+        zIndex: 9999,
+        cursor: 'pointer'
+      }}
+    >
+      Reset User
+    </button>
+  );
 }
 
 export default App

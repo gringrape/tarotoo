@@ -22,7 +22,7 @@ const Container = styled.div`
 
 const LoadingText = styled.div`
   font-family: 'GounBatang', serif;
-  font-size: 1.5rem;
+  font-size: ${theme.typography.subTitle.desktop};
   color: #E0D4FC;
   animation: blink 1.5s infinite;
   
@@ -30,6 +30,11 @@ const LoadingText = styled.div`
     0% { opacity: 0.3; }
     50% { opacity: 1; }
     100% { opacity: 0.3; }
+  }
+
+  ${theme.media.mobile} {
+    font-size: ${theme.typography.subTitle.mobile};
+    margin-top: 1rem; /* Adjust position on mobile */
   }
 `;
 
@@ -100,6 +105,10 @@ const GuidanceText = styled.div`
   color: #fff;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
   text-align: center;
+
+  ${theme.media.mobile} {
+    font-size: ${theme.typography.subTitle.mobile};
+  }
 `;
 
 export function AnalysisResult({ theirCards, myCards }: AnalysisResultProps) {

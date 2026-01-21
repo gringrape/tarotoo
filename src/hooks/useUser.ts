@@ -36,5 +36,11 @@ export function useUser() {
         localStorage.setItem(CREDITS_KEY, newCredits.toString());
     };
 
-    return { userId, credits, updateCredits };
+    const resetUser = () => {
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(CREDITS_KEY);
+        window.location.reload();
+    };
+
+    return { userId, credits, updateCredits, resetUser };
 }

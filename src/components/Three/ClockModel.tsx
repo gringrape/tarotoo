@@ -4,7 +4,7 @@ Run this to identify node names in the console.
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 
-export function ClockModel() {
+export function ClockModel(props: any) {
     const { scene, nodes } = useGLTF('/models/classic_clock.glb');
 
     useFrame((_, delta) => {
@@ -15,5 +15,5 @@ export function ClockModel() {
         if (n.Object_5) n.Object_5.rotation.y += delta * 0.1; // Slow (Minutes/Hours)
     });
 
-    return <primitive object={scene} scale={0.3} />;
+    return <primitive object={scene} scale={0.3} {...props} />;
 }
