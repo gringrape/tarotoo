@@ -25,6 +25,13 @@ const ModalContent = styled(motion.div)`
   text-align: center;
   color: ${theme.colors.text.main};
   min-width: 300px;
+  
+  ${theme.media.mobile} {
+    padding: 2rem;
+    min-width: unset;
+    width: 70%;
+    max-width: 320px;
+  }
 `;
 
 const Question = styled.h2`
@@ -36,12 +43,22 @@ const Question = styled.h2`
   strong {
     color: ${theme.colors.primary};
   }
+
+  ${theme.media.mobile} {
+    font-size: ${theme.typography.subTitle.mobile};
+    margin-bottom: 2rem;
+  }
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
   gap: 2rem;
   justify-content: center;
+
+  ${theme.media.mobile} {
+    gap: 1rem;
+    flex-wrap: wrap; /* Wrap if buttons are too wide */
+  }
 `;
 
 const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
@@ -62,6 +79,11 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
     transform: scale(1.05);
     box-shadow: ${props => props.$variant === 'secondary' ? 'none' : `0 0 25px ${theme.colors.primaryShadow}`};
     border-color: ${props => props.$variant === 'secondary' ? theme.colors.text.main : theme.colors.primaryHover};
+  }
+
+  ${theme.media.mobile} {
+    font-size: ${theme.typography.button.mobile};
+    padding: 0.7rem 1.5rem;
   }
 `;
 
