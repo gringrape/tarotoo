@@ -144,7 +144,7 @@ const server = http.createServer((req, res) => {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(mockResponse));
                 console.log('Response sent.');
-            }, 5000);
+            }, 100000000);
         });
         return;
     }
