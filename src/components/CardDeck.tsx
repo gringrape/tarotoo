@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { TarotCard } from './TarotCard';
 import { TAROT_DATA } from '../data/tarotData';
+import { theme } from '../styles/designSystem';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 // === Deck Configuration ===
 const DECK_CONFIG = {
@@ -19,9 +21,16 @@ const DECK_CONFIG = {
 
 // === Selection Configuration ===
 const SELECTION_CONFIG = {
-  SCALE: 0.7,
-  GAP_PERCENT: 100, // 100 = adjacent
-  Y_OFFSET: '-50vh', // From bottom
+  DESKTOP: {
+    SCALE: 0.9,
+    GAP_PERCENT: 100,
+    Y_OFFSET: '-50vh',
+  },
+  MOBILE: {
+    SCALE: 0.95,
+    GAP_PERCENT: 100,
+    Y_OFFSET: '-60vh',
+  }
 };
 
 const DeckContainer = styled.div`
@@ -37,7 +46,22 @@ const DeckContainer = styled.div`
   pointer-events: none;
   z-index: 10;
   
+  /* CSS Variables for responsive config */
+  --deck-radius: ${DECK_CONFIG.RADIUS_PERCENT};
+  --deck-y-offset: ${DECK_CONFIG.ARC_OFFSET_Y};
+  
   font-size: ${DECK_CONFIG.SCALE.MOBILE}; 
+  
+  ${theme.media.mobile} { 
+    font-size: 0.22rem; 
+    bottom: 0; /* Align to bottom (was -2em) */
+    
+    /* Steeper curvature and position adjustment for mobile */
+    --deck-radius: 200%; /* Steeper than 250% */
+    --deck-y-offset: -40em; /* Adjusted vertical offset */
+    padding-bottom: 5vh; /* Move up slightly */
+  }
+
   @media (min-width: 768px) { font-size: ${DECK_CONFIG.SCALE.TABLET}; }
   @media (min-width: 1024px) { font-size: ${DECK_CONFIG.SCALE.DESKTOP}; }
 `;
@@ -57,6 +81,7 @@ interface CardDeckProps {
 }
 
 export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const TOTAL_CARDS = 22;
   const { ARC_ANGLE } = DECK_CONFIG;
   const START_ANGLE = -ARC_ANGLE / 2;
@@ -82,23 +107,49 @@ export function CardDeck({ selectedCards = [], onCardClick }: CardDeckProps) {
         const selectionIndex = selectedCards.indexOf(cardId);
 
         // --- 1. Fan Position Calculation ---
-        const rotation = START_ANGLE + (index * ANGLE_STEP);
+        let rotation, fanY, fanZIndex;
         const fanX = '0%';
-        const fanY = DECK_CONFIG.ARC_OFFSET_Y;
-        const fanRotate = `${rotation}deg`;
         const fanScale = 1;
-        const fanOrigin = `50% ${DECK_CONFIG.RADIUS_PERCENT}`;
-        const fanZIndex = index;
+        const fanOrigin = `50% var(--deck-radius)`;
+
+        if (isMobile) {
+          // Mobile: 2 Rows (0-10 Back, 11-21 Front)
+          const ROW_SIZE = 11;
+          const isBackRow = index < ROW_SIZE;
+          const indexInRow = index % ROW_SIZE;
+
+          // Re-calculate rotation for the smaller row
+          const rowAngleStep = ARC_ANGLE / (ROW_SIZE - 1);
+          const rowStartAngle = -ARC_ANGLE / 2;
+          rotation = rowStartAngle + (indexInRow * rowAngleStep);
+
+          // Position
+          // Front row uses base offset, Back row is higher up (more negative)
+          fanY = isBackRow ? 'calc(var(--deck-y-offset) - 6rem)' : 'var(--deck-y-offset)';
+
+          // Z-Index: Front row must be on top of Back row
+          fanZIndex = isBackRow ? index : (index + 100);
+
+        } else {
+          // Desktop: Single Arc
+          rotation = START_ANGLE + (index * ANGLE_STEP);
+          fanY = 'var(--deck-y-offset)';
+          fanZIndex = index;
+        }
+
+        const fanRotate = `${rotation}deg`;
 
         // --- 2. Selection Position Calculation ---
-        let selectX = '0%';
-        if (selectionIndex === 0) selectX = `-${SELECTION_CONFIG.GAP_PERCENT}%`;
-        else if (selectionIndex === 1) selectX = '0%';
-        else if (selectionIndex === 2) selectX = `${SELECTION_CONFIG.GAP_PERCENT}%`;
+        const config = isMobile ? SELECTION_CONFIG.MOBILE : SELECTION_CONFIG.DESKTOP;
 
-        const selectY = SELECTION_CONFIG.Y_OFFSET;
+        let selectX = '0%';
+        if (selectionIndex === 0) selectX = `-${config.GAP_PERCENT}%`;
+        else if (selectionIndex === 1) selectX = '0%';
+        else if (selectionIndex === 2) selectX = `${config.GAP_PERCENT}%`;
+
+        const selectY = config.Y_OFFSET;
         const selectRotate = '0deg';
-        const selectScale = SELECTION_CONFIG.SCALE;
+        const selectScale = config.SCALE;
         const selectOrigin = '50% 50%';
         const selectZIndex = 1000 + index;
 
