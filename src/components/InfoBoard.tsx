@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { AnalysisResponse } from '../api/tarotApi';
+import { theme } from '../styles/designSystem';
 import { SingleCardView } from './InfoBoard/SingleCardView';
 import { GridSummaryView } from './InfoBoard/GridSummaryView';
 import { StrategyView } from './InfoBoard/StrategyView';
@@ -16,13 +17,33 @@ const TextContainer = styled(motion.div)`
   padding: 3rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: 2rem;
+  margin-top: -10vh;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   /* overflow is managed by ScrollContent for inner scrolling */
+
+  ${theme.media.mobile} {
+    width: 80vw;
+    padding: 1.5rem;
+    max-height: calc(100vh - 200px); /* Leave ample room for bottom button */
+    overflow-y: auto; /* Allow entire container to scroll */
+    
+    /* Custom Scrollbar for Mobile */
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: ${theme.colors.primary};
+      border-radius: 3px;
+    }
+  }
 `;
 
 interface InfoBoardProps {

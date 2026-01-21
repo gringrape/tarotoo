@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { TarotCard } from '../TarotCard';
 import { TAROT_DATA } from '../../data/tarotData';
+import { theme } from '../../styles/designSystem';
 import { RowWrapper, LeftCol, RightCol, TypeLabel, CardName, TypeText } from './styles';
 
 const ContentWrapper = styled.div`
@@ -9,6 +10,15 @@ const ContentWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
+`;
+
+const TitleWrapper = styled.div`
+  width: 100%;
+  margin-bottom: 1rem;
+
+  ${theme.media.mobile} {
+    margin-bottom: 0.5rem;
+  }
 `;
 
 const CardDisplay = styled(motion.div)`
@@ -19,6 +29,10 @@ const CardDisplay = styled(motion.div)`
   transform-style: preserve-3d;
   position: relative;
   flex-shrink: 0;
+
+  ${theme.media.mobile} {
+    font-size: 0.3em; /* 50% smaller than 0.6em */
+  }
 `;
 
 interface SingleCardViewProps {
@@ -33,9 +47,10 @@ export function SingleCardView({ cardId, section, name, desc, isFlipStep }: Sing
     return (
         <ContentWrapper key={cardId}>
             {/* Header: Section Title */}
-            <div style={{ width: '100%', marginBottom: '1rem' }}>
+            {/* Header: Section Title */}
+            <TitleWrapper>
                 <TypeLabel>{section}</TypeLabel>
-            </div>
+            </TitleWrapper>
 
             <CardName>{name}</CardName>
             <RowWrapper>
