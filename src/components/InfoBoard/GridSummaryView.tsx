@@ -3,12 +3,13 @@ import { motion } from 'framer-motion';
 import { TarotCard } from '../TarotCard';
 import { TAROT_DATA } from '../../data/tarotData';
 import type { AnalysisSection } from '../../api/tarotApi';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { ScrollContent, ResultTitle, CardName, ResultDesc, RowWrapper, LeftCol, RightCol } from './styles';
 
 const LAYOUT_CONFIG = {
     // Adjust these to control card size
     CARD_SCALE_DESKTOP: '0.15rem',
-    CARD_SCALE_MOBILE: '0.1rem',
+    CARD_SCALE_MOBILE: '0.15rem',
 
     // Container dimensions (relative to scale)
     FAN_WIDTH: '32em',
@@ -20,7 +21,7 @@ const FanContainer = styled.div`
   position: relative;
   width: ${LAYOUT_CONFIG.FAN_WIDTH};
   height: ${LAYOUT_CONFIG.FAN_HEIGHT};
-  margin-top: 1rem;
+  margin-top: 2rem;
   z-index: 100;
   
   /* Allow cards to extend outside */
@@ -36,12 +37,12 @@ const FanContainer = styled.div`
     width: 20em;
     height: 18em;
     font-size: ${LAYOUT_CONFIG.CARD_SCALE_MOBILE};
-    margin: 0 1em; /* Smaller margin on mobile */
+    margin: 0 2em; /* Smaller margin on mobile */
   }
 `;
 
 // Individual Card in the Fan
-const FannedCard = styled.div<{ index: number }>`
+const FannedCard = styled.div<{ index: number; $isMobile: boolean }>`
   position: absolute;
   width: 14em; /* Intrinsic card size */
   aspect-ratio: 20/35;
@@ -52,18 +53,23 @@ const FannedCard = styled.div<{ index: number }>`
   box-shadow: 0 10px 20px rgba(0,0,0,0.3);
 
   /* Fan Logic based on index (0, 1, 2) */
-  ${({ index }) => {
+  ${({ index, $isMobile }) => {
+        // Determine offset based on device
+        const outerY = $isMobile ? '-8em' : '2em';
+        const centerY = $isMobile ? '-10em' : '0em';
+
         if (index === 0) return `
       z-index: 1;
-      transform: translateX(-110%) rotate(-15deg) translateY(2em);
+      transform: translateX(-110%) rotate(-15deg) translateY(${outerY});
     `;
         if (index === 1) return `
       z-index: 10; /* Center card on top */
-      transform: translateX(-50%) translateY(0);
+      transform: translateX(-50%) translateY(${centerY});
+      
     `;
         if (index === 2) return `
       z-index: 1;
-      transform: translateX(10%) rotate(15deg) translateY(2em);
+      transform: translateX(10%) rotate(15deg) translateY(${outerY});
     `;
     }}
 
@@ -84,6 +90,7 @@ interface GridSummaryViewProps {
 }
 
 export function GridSummaryView({ theirCards, myCards, theirFeelings, myFeelings }: GridSummaryViewProps) {
+    const isMobile = useMediaQuery('(max-width: 768px)');
     return (
         <ScrollContent key="step-13-grid">
             <motion.div
@@ -100,7 +107,7 @@ export function GridSummaryView({ theirCards, myCards, theirFeelings, myFeelings
                     <LeftCol>
                         <FanContainer>
                             {theirCards.map((cardId, i) => (
-                                <FannedCard key={`their-${i}`} index={i}>
+                                <FannedCard key={`their-${i}`} index={i} $isMobile={isMobile}>
                                     <div>
                                         <TarotCard image={TAROT_DATA[cardId].image} />
                                     </div>
@@ -122,7 +129,7 @@ export function GridSummaryView({ theirCards, myCards, theirFeelings, myFeelings
                     <LeftCol>
                         <FanContainer>
                             {myCards.map((cardId, i) => (
-                                <FannedCard key={`my-${i}`} index={i}>
+                                <FannedCard key={`my-${i}`} index={i} $isMobile={isMobile}>
                                     <div>
                                         <TarotCard image={TAROT_DATA[cardId].image} />
                                     </div>

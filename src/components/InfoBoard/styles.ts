@@ -32,11 +32,11 @@ export const RowWrapper = styled.div`
   justify-content: center;
   width: 100%;
   gap: 3rem;
-  margin-top: 2rem;
+  margin-top: 3rem;
   
   ${theme.media.mobile} {
     flex-direction: column;
-    gap: 2rem;
+    gap: 2.5rem;
     align-items: center;
   }
 `;
@@ -67,6 +67,12 @@ export const CardName = styled.h4`
   color: ${theme.colors.primary};
   margin: 0 0 1.5rem 0;
   font-weight: bold;
+
+  ${theme.media.mobile} {
+    font-size: 1.2em;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
 `;
 
 export const ResultTitle = styled.h2`
@@ -75,6 +81,11 @@ export const ResultTitle = styled.h2`
   margin-bottom: 1rem;
   color: ${theme.colors.text.highlight};
   flex-shrink: 0;
+
+  ${theme.media.mobile} {
+    font-size: 1.5em; /* Match SingleCardView title size */
+    margin-bottom: 1.5rem;
+  }
 `;
 
 export const ResultDesc = styled.div`
@@ -83,7 +94,14 @@ export const ResultDesc = styled.div`
   color: ${theme.colors.text.main};
   word-break: keep-all;
   word-wrap: break-word; /* Ensure compatibility */
+  word-wrap: break-word; /* Ensure compatibility */
   text-align: left;
+
+  ${theme.media.mobile} {
+    font-size: 0.9em;
+    line-height: 1.6;
+    text-align: left; /* Keep left align for readability */
+  }
   
   /* Markdown Styles */
   h1, h2, h3 {
