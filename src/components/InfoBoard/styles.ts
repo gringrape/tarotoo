@@ -34,7 +34,7 @@ export const RowWrapper = styled.div`
   gap: 3rem;
   margin-top: 2rem;
   
-  @media (max-width: 768px) {
+  ${theme.media.mobile} {
     flex-direction: column;
     gap: 2rem;
     align-items: center;
@@ -55,6 +55,11 @@ export const RightCol = styled.div`
   justify-content: center;
   flex: 1;
   text-align: left;
+  width: 100%;
+  
+  ${theme.media.mobile} {
+    align-items: center; /* Center text alignment wrapper on mobile */
+  }
 `;
 
 export const CardName = styled.h4`

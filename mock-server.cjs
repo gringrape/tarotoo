@@ -26,7 +26,7 @@ const server = http.createServer((req, res) => {
     // 1. Create User
     if (req.url === '/api/users' && req.method === 'POST') {
         const userId = randomUUID();
-        users[userId] = { credits: 1 };
+        users[userId] = { credits: 5 };
 
         console.log(`[Mock] Created user ${userId} with 1 credit.`);
 
@@ -144,7 +144,7 @@ const server = http.createServer((req, res) => {
                 res.writeHead(200, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify(mockResponse));
                 console.log('Response sent.');
-            }, 100000000);
+            }, 1000);
         });
         return;
     }

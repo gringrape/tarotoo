@@ -104,7 +104,7 @@ function App() {
 
   return (
     <Container>
-      <Title>재회타로</Title>
+      {phase !== 'ANALYSIS' && <Title>재회타로</Title>}
       <DevControls onReset={resetUser} />
 
       {phase !== 'ANALYSIS' ? (
