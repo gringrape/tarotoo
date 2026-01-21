@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { theme } from '../styles/designSystem';
 
 const Container = styled.div`
   display: flex;
@@ -13,10 +14,14 @@ const Container = styled.div`
 
 const Title = styled.h1`
   font-family: 'GounBatang', serif;
-  font-size: 4rem;
+  font-size: ${theme.typography.heading.desktop};
   color: #fff; /* White */
   margin-bottom: 2rem;
   text-shadow: 0 0 20px rgba(0, 255, 209, 0.5);
+
+  ${theme.media.mobile} {
+    font-size: ${theme.typography.heading.mobile};
+  }
 `;
 
 const Description = styled.div`
@@ -24,11 +29,16 @@ const Description = styled.div`
   flex-direction: column;
   align-items: center;
   font-family: 'GounBatang', serif;
-  font-size: 1.5rem;
+  font-size: ${theme.typography.body.desktop};
   color: #E0D4FC; /* Light Lavender */
   margin-bottom: 4rem;
   line-height: 1.6;
   opacity: 0.9;
+
+  ${theme.media.mobile} {
+    font-size: ${theme.typography.body.mobile};
+    margin-bottom: 2rem;
+  }
 `;
 
 const Highlight = styled.span`
@@ -41,7 +51,7 @@ const StartButton = styled.button`
   color: #333; /* Dark text for contrast */
   border: none;
   padding: 1rem 4rem;
-  font-size: 1.5rem;
+  font-size: ${theme.typography.button.desktop};
   border-radius: 50px;
   cursor: pointer;
   font-family: 'GounBatang', serif;
@@ -53,6 +63,11 @@ const StartButton = styled.button`
     background: #00cca7;
     transform: scale(1.05);
     box-shadow: 0 0 25px rgba(0, 255, 209, 0.6);
+  }
+
+  ${theme.media.mobile} {
+    font-size: ${theme.typography.button.mobile};
+    padding: 0.8rem 2.5rem;
   }
 `;
 
